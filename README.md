@@ -1,36 +1,29 @@
-# 15GoFast
-TiraLabra
+# README
 
-## Mitä ohjelmointikieltä käytät? 
+## About
 
-Tässä projektissa käytän ohjelmointi kieltä nimeltä [golang](https://go.dev).
+15Puzzle game solver
 
-## Kerro myös mitä muita kieliä hallitset siinä määrin, että pystyt tarvittaessa vertaisarvioimaan niillä tehtyjä projekteja.
+## Live Development
 
-Java,Python,Typescript
+To run in live development mode, run `wails dev` in the project directory. This will run a Vite development
+server that will provide very fast hot reload of your frontend changes. If you want to develop in a browser
+and have access to your Go methods, there is also a dev server that runs on http://localhost:34115. Connect
+to this in your browser, and you can call your Go code from devtools.
 
-## Mitä algoritmeja ja tietorakenteita toteutat työssäsi?
+## Building
 
-Algoritminä käytän [IDA*](https://en.wikipedia.org/wiki/Iterative_deepening_A*)
-
-## Mitä ongelmaa ratkaiset ja miksi valitsit kyseiset algoritmit/tietorakenteet?
-
-Projektin tarkoituksena on keksi tapa miten automaattisesti pystytään ratkaisemaan [15 puzzle](https://en.wikipedia.org/wiki/15_puzzle)
-
-Valitsin IDA:n koska sen ominaisuudet soveltuvat parhaiten valitsemaani ongelmaan.
-
-## Mitä syötteitä ohjelma saa ja miten näitä käytetään?
-
-Ohjelma saa syötteenä randomisti generoidun 15 puzzlen
-
-## Tavoitteena olevat aika- ja tilavaativuudet (m.m. O-analyysit)
-
-TBA
-
-## Käytetyt kielet 
-
-Tarkoituksena on käyttää määrittelydokumenttiin Suomea mutta koodissa ja kommenteissa tulen käyttämään Englantia. 
-Jonka takia myös ohjelmiston dokumentaatio tulee käyttämään Englantia koska aion käyttää automaattista dokumentaation generointia kommenttien pohjalta. [gogen](https://go.dev/blog/godoc)
+To build a redistributable, production mode package, use `wails build`.
 
 
-## TBA 
+## Testing
+
+To test the core logic of the application run
+```terminal
+go test . 
+```
+
+## Reports
+
+[week 1](https://github.com/ferealqq/15GoFast/blob/main/documentation/weekly/week1.md)
+[week 2](https://github.com/ferealqq/15GoFast/blob/main/documentation/weekly/week2.md)
