@@ -1,4 +1,4 @@
-module changeme
+module 15GoFast
 
 go 1.18
 
