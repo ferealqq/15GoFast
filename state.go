@@ -80,7 +80,7 @@ func (state *State) GetValidStates() []*State {
 	var moves = []*State{}
 
 	// get emtpy index from the board
-	emptyIndex := GetElementIndex[int](state.board, 0) 
+	emptyIndex := GetElementIndex(state.board, 0) 
 	
 	// the basic logic of puzzle 15 game is that you cannot move off the grid 16x16
 	// and you have to move one step at the time at 16x16 grid. Which means that you have to move either +1 -1 +4 -4
