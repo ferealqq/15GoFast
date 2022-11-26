@@ -9,10 +9,24 @@ import (
 
 const BOARD_ROW_SIZE = 4
 
+type t_direction int8;
+// Directions
+const (
+	DIRECTION_UP = t_direction(0)
+	DIRECTION_DOWN = t_direction(1)
+	DIRECTION_LEFT = t_direction(2)
+	DIRECTION_RIGHT = t_direction(3)
+)
+type Move struct {
+	emptyIndex int
+	toIndex int
+	direction t_direction
+}
 type State struct {
 	size int
 	board []int
 	complexity int
+	move *Move
 }
 
 func NewState() *State{
@@ -75,9 +89,14 @@ func GetElementIndex[T comparable](arr []T,element T) int {
 	return -1;
 }
 
+// This code has to be very optimized, at the moment this will call too manu mutations
+
 // Calculate all the states that the current state can be mutated to
 func (state *State) GetValidStates() []*State {
-	var moves = []*State{}
+	// This function is currently O(N^2) - O(N^N), where N = 4 
+	// appned O(N)
+	// newSwap O(N)*
+	var states = []*State{}
 
 	// get emtpy index from the board
 	emptyIndex := GetElementIndex(state.board, 0) 
@@ -85,27 +104,45 @@ func (state *State) GetValidStates() []*State {
 	// the basic logic of puzzle 15 game is that you cannot move off the grid 16x16
 	// and you have to move one step at the time at 16x16 grid. Which means that you have to move either +1 -1 +4 -4
 	// for example you cannot move up if you are in the top row of the grid. 
+
+	// not on the first line
 	if (emptyIndex - state.size >= 0) {
-		moves = append(moves, state.newSwap(emptyIndex, emptyIndex - state.size))
+		states = append(states, state.newSwap(&Move{
+			emptyIndex, 
+			emptyIndex - state.size,
+			DIRECTION_DOWN,
+		}))
 	}
 	// Not on last line
 	if (emptyIndex + state.size < len(state.board)) {
-		moves = append(moves, state.newSwap(emptyIndex, emptyIndex + state.size))
+		states = append(states, state.newSwap(&Move{
+			emptyIndex, 
+			emptyIndex + state.size,
+			DIRECTION_UP,
+		}))
 	}
 	// Not on right edge
 	if (emptyIndex % state.size != state.size-1) {
-		moves = append(moves, state.newSwap(emptyIndex, emptyIndex + 1))
+		states = append(states, state.newSwap(&Move{
+			emptyIndex, 
+			emptyIndex + 1,
+			DIRECTION_RIGHT,
+		}))
 	}
 	// Not on left edge
 	if (emptyIndex % state.size != 0) {
-		moves = append(moves, state.newSwap(emptyIndex, emptyIndex - 1))
+		states = append(states, state.newSwap(&Move{
+			emptyIndex, 
+			emptyIndex - 1,
+			DIRECTION_LEFT,
+		}))
 	}
 
-	return moves
+	return states
 }
 
 // swaps the two elements in the given indexes for a new state
-func (state *State) newSwap(emptyIndex int, newIndex int) *State {
+func (state *State) newSwap(move *Move) *State {
 	// we have to create a copy of the board because otherwise they will be linked with a pointer
 	boardCopy := make([]int, len(state.board))
 	copy(boardCopy, state.board)
@@ -113,10 +150,11 @@ func (state *State) newSwap(emptyIndex int, newIndex int) *State {
 		board: boardCopy,
 		size: state.size,
 		complexity: state.complexity+1,
+		move: move,
 	}
-	val := state.board[newIndex]
-	newState.board[newIndex] = state.board[emptyIndex]
-	newState.board[emptyIndex] = val
+	val := state.board[move.toIndex]
+	newState.board[move.toIndex] = state.board[move.emptyIndex]
+	newState.board[move.emptyIndex] = val
 	return newState
 }
 
