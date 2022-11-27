@@ -4,6 +4,20 @@
 
 15Puzzle game solver
 
+## Documentation
+If you want to see the documentation of the application you'll have to have docker installed on your computer. 
+
+
+To start the documentation server use script `run_documentation.sh`
+Example: 
+```terminal
+chmod +x run_documentation.sh
+./run_documentation.sh
+```
+
+After you have successfully started the documentation server you can find the documentation via this [path](http://localhost:6060/pkg/github.com/ferealqq/15GoFast/)
+
+
 ## Live Development
 
 To run in live development mode, run `wails dev` in the project directory. This will run a Vite development
@@ -21,7 +35,7 @@ To build a redistributable, production mode package, use `wails build`.
 To test the core logic of the application run
 ```terminal
 go test . 
-```
+```https://github.com/ferealqq/15GoFast/blob/main/documentation/weekly/week1.md
 
 ## Reports
 

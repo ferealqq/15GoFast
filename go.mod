@@ -1,4 +1,4 @@
-module changeme
+module github.com/ferealqq/15GoFast
 
 go 1.18
 

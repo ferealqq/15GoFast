@@ -1,4 +1,4 @@
-package main
+package gofast
 
 import (
 	"context"
@@ -29,30 +29,30 @@ func (app *App) Greet(name string) string {
 }
 
 // Indexs of the borders of the puzzle games grid
-var verticalTop = []int{0,1,2,3};
-var horizontalLeft = []int{0,4,8,12};
-var horizontalRight = []int{3,7,11,15};
-var verticalBottom = []int{12,13,14,15};
+var verticalTop = []int{0, 1, 2, 3}
+var horizontalLeft = []int{0, 4, 8, 12}
+var horizontalRight = []int{3, 7, 11, 15}
+var verticalBottom = []int{12, 13, 14, 15}
 
 // Get positions that the player can move to
-func (app *App) GetValidPositions(emptyIndex int) []int{
+func (app *App) GetValidPositions(emptyIndex int) []int {
 	var moves = []int{}
-	
+
 	// the basic logic of puzzle 15 game is that you cannot move off the grid 16x16
 	// and you have to move one step at the time at 16x16 grid. Which means that you have to move either +1 -1 +4 -4
-	// for example you cannot move up if you are in the top row of the grid. 
-  if(!Contains(verticalBottom,emptyIndex)){
-    moves = append(moves,emptyIndex+4);
-  }
-  if(!Contains(verticalTop,emptyIndex)){
-    moves = append(moves,emptyIndex-4);
-  }
-  if(!Contains(horizontalLeft,emptyIndex)){
-    moves = append(moves,emptyIndex-1);
-  }
-  if(!Contains(horizontalRight,emptyIndex)){
-    moves = append(moves,emptyIndex+1);
-  }
+	// for example you cannot move up if you are in the top row of the grid.
+	if !Contains(verticalBottom, emptyIndex) {
+		moves = append(moves, emptyIndex+4)
+	}
+	if !Contains(verticalTop, emptyIndex) {
+		moves = append(moves, emptyIndex-4)
+	}
+	if !Contains(horizontalLeft, emptyIndex) {
+		moves = append(moves, emptyIndex-1)
+	}
+	if !Contains(horizontalRight, emptyIndex) {
+		moves = append(moves, emptyIndex+1)
+	}
 
 	return moves
 }
@@ -60,9 +60,9 @@ func (app *App) GetValidPositions(emptyIndex int) []int{
 // Checks wheter a certain variable exist in the given array
 func Contains[T comparable](arr []T, x T) bool {
 	for _, v := range arr {
-			if v == x {
-					return true
-			}
+		if v == x {
+			return true
+		}
 	}
 	return false
 }
@@ -79,11 +79,11 @@ func Times[T any](count int, iteratee func(index int) T) []T {
 }
 
 // checks if the given move is correct or incorrect
-func (app *App) ValidateMove(move [2]int,emptyIndex int) bool {
+func (app *App) ValidateMove(move [2]int, emptyIndex int) bool {
 	pos := app.GetValidPositions(emptyIndex)
-	var result = false;
-	
-	for _,v := range pos {
+	var result = false
+
+	for _, v := range pos {
 		if move == [2]int{emptyIndex, v} {
 			result = true
 		}
