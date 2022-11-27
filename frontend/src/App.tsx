@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import logo from "./assets/images/logo-universal.png";
 import "./App.css";
 import { GetRandomMove } from "../wailsjs/go/main/App";
 import { Text, Button, ChakraProvider, Grid, GridItem } from "@chakra-ui/react";

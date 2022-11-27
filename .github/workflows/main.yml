@@ -16,11 +16,8 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           go-version: '1.18'
-      - name: Build frontend
-        run: |
-          npm install --production ; npm run build
-        working-directory: ./frontend
       - name: Run coverage
-        run: go test -race -coverprofile=coverage.out -covermode=atomic
+        run: 
+          cd frontend && npm install && npm run build && cd .. &&   go test -race -coverprofile=coverage.out -covermode=atomic
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
