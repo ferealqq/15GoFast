@@ -1,4 +1,4 @@
-package main
+package gofast
 
 import (
 	b64 "encoding/base64"
@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// Describes how many rows the board has
 const BOARD_ROW_SIZE = 4
 
 type t_direction int8
@@ -19,12 +20,14 @@ const (
 	DIRECTION_RIGHT = t_direction(3)
 )
 
+// Describes what kind of a move has been executed
 type Move struct {
 	emptyIndex int
 	toIndex    int
 	direction  t_direction
 }
 
+// State of the 15 puzzle board
 type State struct {
 	size       int
 	board      []int
@@ -32,6 +35,7 @@ type State struct {
 	move       *Move
 }
 
+// returns pointer to a new state with clean board.
 func NewState() *State {
 	return &State{
 		size:       BOARD_ROW_SIZE,
@@ -40,7 +44,7 @@ func NewState() *State {
 	}
 }
 
-// Because all boards are not solvable we have to make a board that is solvalable
+// Genereates a State with a board that has shuffeled with N transitions where N is complexity
 func GenerateState(complexity int) (*State, error) {
 	// https://www.geeksforgeeks.org/check-instance-15-puzzle-solvable/
 	state := NewState()

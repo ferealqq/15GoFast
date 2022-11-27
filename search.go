@@ -1,16 +1,15 @@
-package main
+package gofast
 
 import "fmt"
 
+// Contains all the important variables for the search
 type SearchState struct {
 	heuristic       int
 	state           *State
 	horizontalBoard []int
 }
 
-// type Search struct {
-// }
-
+// Transition given vertical board to horizontal representation of the given board
 func calculateHorizontalBoard(board []int) []int {
 	horizontalBoard := make([]int, len(board))
 	copy(horizontalBoard, board)
@@ -64,11 +63,13 @@ func invertDistance(board []int) int {
 	return vertical + horizontal
 }
 
+// node struct of search state, this helps the idastar algorithm to keep track of the depth the algorithm has gone through
 type Node struct {
 	SearchState
 	depth int
 }
 
+// create a new search struct from a state
 func NewSearch(state *State) *SearchState {
 	srh := &SearchState{
 		state:     state,
@@ -85,7 +86,6 @@ func (search *SearchState) IDAStar(maxDepth int) *Node {
 	depth := 0
 	cutoff := search.heuristic
 	for depth < maxDepth {
-		// fmt.Println("IDA Search started")
 		status, cut, res := IDASearch(search, cutoff, depth)
 		if status == SUCCESS {
 			return res
@@ -98,12 +98,15 @@ func (search *SearchState) IDAStar(maxDepth int) *Node {
 	return nil
 }
 
-type success = int8
+// Status constatns of the search state,
+type STATUS = int8
 
-const SUCCESS = int8(1)
-const CUTOFF = int8(2)
+// These constants describe what is the current state of the search algorithm
+const SUCCESS = STATUS(1)
+const CUTOFF = STATUS(2)
 
-func IDASearch(search *SearchState, cutoff int, startDepth int) (success, int, *Node) {
+// IDASearch
+func IDASearch(search *SearchState, cutoff int, startDepth int) (STATUS, int, *Node) {
 	h := invertDistance(search.state.board)
 	f := h + startDepth
 	if f > cutoff {

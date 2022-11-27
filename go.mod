@@ -1,4 +1,4 @@
-module 15GoFast
+module github.com/ferealqq/15GoFast
 
 go 1.18
 

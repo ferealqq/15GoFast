@@ -1,4 +1,4 @@
-package main
+package gofast
 
 import (
 	"fmt"
@@ -77,8 +77,6 @@ func isSolvable(board []int) bool {
 		return !(invCount%2 == 1)
 	} else {
 		pos := GetElementIndex(board, 0)
-		fmt.Printf(" pos %d is even %d \n", pos, pos%2)
-		fmt.Printf(" inv count %d \n", invCount)
 		if pos%2 == 0 {
 			return !(invCount%2 == 0)
 		} else {
