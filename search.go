@@ -6,19 +6,22 @@ import "fmt"
 type SearchState struct {
 	heuristic       int
 	state           *State
-	horizontalBoard []int
-	memoInvertDistance MemoizedFunction[int]
-	memoHorizontalBoard MemoizedFunction[int]
+	memoInvertDistance MemoizedFunction[int,[]int]
+	findIndexHorizontal MemoizedFunction[int,int]
 }
 
-type MemoizedFunction[T int | []int] func([]int) T
+type MemoizedFunction[T interface{}, R interface{}] func(R) T
+
+var memoCalled = 0
 
 // because we are doing alot of expensive or semi expensive calculations. It's prefered that we memoize the values that these calls return rather than we call the operations with same values again and again
-func memoizeBoardCalculation[T int | []int](fn MemoizedFunction[T]) MemoizedFunction[T] {
+func memoizeBoardCalculation[T interface{}, R interface{}](fn MemoizedFunction[T,R]) MemoizedFunction[T,R] {
 	cache := make(map[interface{}]T)
 
-	return func(input []int) T {
+	return func(input R) T {
 		if val, found := cache[input]; found {
+			memoCalled++;
+			fmt.Printf("memo called %d \n", memoCalled)
 			return val
 		}
 		val := fn(input)
@@ -28,8 +31,8 @@ func memoizeBoardCalculation[T int | []int](fn MemoizedFunction[T]) MemoizedFunc
 } 
 
 // Transition given vertical board to horizontal representation of the given board
-func calculateHorizontalBoard(board []int) []int {
-	board = startingPoint(4)
+func calculateHorizontalBoard(rowSize int) []int {
+	board := startingPoint(rowSize)
 	horizontalBoard := make([]int, len(board))
 	copy(horizontalBoard, board)
 	// make the board list be a horizontal representation of the puzzle board
@@ -40,6 +43,17 @@ func calculateHorizontalBoard(board []int) []int {
 	}
 
 	return horizontalBoard
+}
+
+var memoHorizontalBoard = calculateHorizontalBoard(BOARD_ROW_SIZE)
+
+func findIndexInHorizontalBoard(num int) int {
+	for i := range memoHorizontalBoard {
+		if memoHorizontalBoard[i] == num {
+			return i
+		}
+	}
+	return -1
 }
 
 // Evaluate the invert distance of t
@@ -59,16 +73,15 @@ func invertDistance(board []int) int {
 	}
 	vertical := inv/3 + 1
 
-	horizontalBoard := calculateHorizontalBoard(board)
 	// calculate the horizontal inversions
 	inv = 0
 	for i := range board {
 		// true value of the node so we have to minus one
-		value := board[i] - 1
+		value := board[i] 
 		if value != -1 {
 			id := 0
-			for j := range horizontalBoard {
-				if horizontalBoard[j] == value {
+			for j := range memoHorizontalBoard {
+				if memoHorizontalBoard[j] == value {
 					id = j
 					break
 				}
@@ -93,6 +106,8 @@ func NewSearch(state *State) *SearchState {
 	srh := &SearchState{
 		state:     state,
 		heuristic: invertDistance(state.board),
+		memoInvertDistance: memoizeBoardCalculation(invertDistance),
+		findIndexHorizontal: memoizeBoardCalculation(findIndexInHorizontalBoard),
 	}
 
 	return srh
@@ -166,18 +181,6 @@ func (search *SearchState) IDASearch(cutoff int, startDepth int) (STATUS, int, *
 	return -1, 0, current
 }
 
-func (search *SearchState) findIndexHorizontal(num int) int {
-	if search.horizontalBoard == nil {
-		panic("horizontalBoard must be defined if you want to call function findIndexHorizontal")
-	}
-	for i := range search.horizontalBoard {
-		if search.horizontalBoard[i] == num {
-			return i
-		}
-	}
-	return -1
-}
-
 func (search *SearchState) isSuccess() bool {
 	for i := 0; i < BOARD_ROW_SIZE*BOARD_ROW_SIZE-1; i++ {
 		if search.state.board[i] != i+1 {
@@ -205,7 +208,6 @@ func (search *SearchState) invertDistanceFromMove() int {
 
 	board := search.state.board
 	move := search.state.move
-	search.horizontalBoard = calculateHorizontalBoard(board)
 	switch move.direction {
 	case DIRECTION_UP:
 		{
@@ -247,9 +249,9 @@ func (search *SearchState) invertDistanceFromMove() int {
 			emptyIndex := search.findIndexHorizontal(0)
 			toIndex := search.findIndexHorizontal(board[move.emptyIndex])
 			idx := toIndex + 1
-			tile := search.horizontalBoard[emptyIndex]
+			tile := memoHorizontalBoard[emptyIndex]
 			for idx < emptyIndex {
-				if search.horizontalBoard[idx] > tile { // tätä kutsutaan 3 kertaa indexeillä 2,3,4
+				if memoHorizontalBoard[idx] > tile { // tätä kutsutaan 3 kertaa indexeillä 2,3,4
 					count++
 				} else {
 					count--
@@ -262,9 +264,9 @@ func (search *SearchState) invertDistanceFromMove() int {
 			emptyIndex := search.findIndexHorizontal(0)
 			toIndex := search.findIndexHorizontal(board[move.emptyIndex])
 			idx := toIndex - 1
-			tile := search.horizontalBoard[emptyIndex]
+			tile := memoHorizontalBoard[emptyIndex]
 			for idx > emptyIndex {
-				if search.horizontalBoard[idx] > tile { // tätä kutsutaan 3 kertaa indexeillä 2,3,4
+				if memoHorizontalBoard[idx] > tile { // tätä kutsutaan 3 kertaa indexeillä 2,3,4
 					count--
 				} else {
 					count++

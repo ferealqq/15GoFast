@@ -42,8 +42,37 @@ func TestHorizontal(t *testing.T) {
 	assert.Equal(t, trans, to)
 }
 
+func TestSearchRandom(t *testing.T) {
+	st, _ := GenerateState(7)
+	board := st.board
+	state := NewState()
+	state.board = board
+	fmt.Println("before state board")
+	fmt.Println(state.board)
+	srh := NewSearch(state)
+	node := srh.IDAStar(5)
+	fmt.Println("after state board")
+	fmt.Println(state.board)
+	assert.NotNil(t, node)
+	assert.Equal(t, node.state.board, startingPoint(4))
+}
+
 func TestSearchEasy(t *testing.T) {
 	board := []int{1, 2, 0, 4, 5, 6, 3, 8, 9, 10, 7, 11, 13, 14, 15, 12}
+	state := NewState()
+	state.board = board
+	fmt.Println("before state board")
+	fmt.Println(state.board)
+	srh := NewSearch(state)
+	node := srh.IDAStar(5)
+	fmt.Println("after state board")
+	fmt.Println(state.board)
+	assert.NotNil(t, node)
+	assert.Equal(t, node.state.board, startingPoint(4))
+}
+
+func TestSearchBug(t *testing.T) {
+	board := []int{1, 2, 3, 4, 5, 6, 7, 8, 0, 9, 10, 12, 13, 14, 11, 15}	
 	state := NewState()
 	state.board = board
 	fmt.Println("before state board")
