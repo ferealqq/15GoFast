@@ -7,7 +7,25 @@ type SearchState struct {
 	heuristic       int
 	state           *State
 	horizontalBoard []int
+	memoInvertDistance MemoizedFunction[int]
+	memoHorizontalBoard MemoizedFunction[int]
 }
+
+type MemoizedFunction[T int | []int] func([]int) T
+
+// because we are doing alot of expensive or semi expensive calculations. It's prefered that we memoize the values that these calls return rather than we call the operations with same values again and again
+func memoizeBoardCalculation[T int | []int](fn MemoizedFunction[T]) MemoizedFunction[T] {
+	cache := make(map[interface{}]T)
+
+	return func(input []int) T {
+		if val, found := cache[input]; found {
+			return val
+		}
+		val := fn(input)
+		cache[input] = fn(input)
+		return val
+	} 
+} 
 
 // Transition given vertical board to horizontal representation of the given board
 func calculateHorizontalBoard(board []int) []int {
@@ -87,7 +105,7 @@ func (search *SearchState) IDAStar(maxDepth int) *Node {
 	depth := 0
 	cutoff := search.heuristic
 	for depth < maxDepth {
-		status, cut, res := IDASearch(search, cutoff, depth)
+		status, cut, res := search.IDASearch(cutoff, depth)
 		if status == SUCCESS {
 			return res
 		} else if status == CUTOFF {
@@ -107,7 +125,7 @@ const SUCCESS = STATUS(1)
 const CUTOFF = STATUS(2)
 
 // IDASearch
-func IDASearch(search *SearchState, cutoff int, startDepth int) (STATUS, int, *Node) {
+func (search *SearchState) IDASearch(cutoff int, startDepth int) (STATUS, int, *Node) {
 	h := invertDistance(search.state.board)
 	f := h + startDepth
 	if f > cutoff {
@@ -126,10 +144,8 @@ func IDASearch(search *SearchState, cutoff int, startDepth int) (STATUS, int, *N
 	for i := range sts {
 		next := sts[i]
 		// idea if has seen next why bother calculating? we can maybe use cache to store that hash and the state so we don't have to recalculate the whole thing if it has seen the current
-		status, probableCutoff, node := IDASearch(&SearchState{
-			heuristic: invertDistance(next.board),
-			state:     next,
-		}, cutoff, startDepth+1)
+		search.state = next 
+		status, probableCutoff, node := search.IDASearch(cutoff, startDepth+1)
 		if status == CUTOFF {
 			stop = true
 			nextCutoff = probableCutoff
@@ -155,7 +171,6 @@ func (search *SearchState) findIndexHorizontal(num int) int {
 		panic("horizontalBoard must be defined if you want to call function findIndexHorizontal")
 	}
 	for i := range search.horizontalBoard {
-		// fmt.Printf("i = %d horizontalBoard[i] = %d  num = %d \n", i, search.horizontalBoard[i], num)
 		if search.horizontalBoard[i] == num {
 			return i
 		}
@@ -245,8 +260,6 @@ func (search *SearchState) invertDistanceFromMove() int {
 	case DIRECTION_LEFT:
 		{
 			emptyIndex := search.findIndexHorizontal(0)
-			// fmt.Printf("empty index %d, board move empty index %d \n ", emptyIndex, board[move.emptyIndex])
-			// fmt.Println(search.horizontalBoard)
 			toIndex := search.findIndexHorizontal(board[move.emptyIndex])
 			idx := toIndex - 1
 			tile := search.horizontalBoard[emptyIndex]

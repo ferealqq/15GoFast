@@ -53,12 +53,12 @@ func GenerateState(complexity int) (*State, error) {
 
 	rand.Seed(time.Now().UnixNano())
 	for state.complexity < complexity {
-		visited = append(visited, state.hash())
+		visited = append(visited, hash(state.board))
 		sts := state.GetValidStates()
 		filtered := []*State{}
 		for i := range sts {
 			for j := range visited {
-				if visited[j] != sts[i].hash() {
+				if visited[j] != hash(sts[i].board) {
 					filtered = append(filtered, sts[i])
 					break
 				}
@@ -165,10 +165,11 @@ func (state *State) newSwap(move *Move) *State {
 	return newState
 }
 
-func (state *State) hash() string {
-	var bs = make([]byte, len(state.board))
-	for i := 0; i < len(state.board); i++ {
-		bs[i] = byte(state.board[i])
+// create a unique value for the board represented as string
+func hash(board []int) string {
+	var bs = make([]byte, len(board))
+	for i := 0; i < len(board); i++ {
+		bs[i] = byte(board[i])
 	}
 	return b64.StdEncoding.EncodeToString(bs)
 }
