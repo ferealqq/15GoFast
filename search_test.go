@@ -1,6 +1,7 @@
-package gofast
+package main
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -41,15 +42,16 @@ func TestHorizontal(t *testing.T) {
 	assert.Equal(t, trans, to)
 }
 
-// func TestSearchEasy(t *testing.T) {
-// 	board := []int{1, 2, 0, 4, 5, 6, 3, 8, 9, 10, 7, 11, 13, 14, 15, 12}
-// 	state := NewState()
-// 	state.board = board
-// 	fmt.Println("before state board")
-// 	fmt.Println(state.board)
-// 	srh := NewSearch(state)
-// 	node := srh.IDAStar(5)
-// 	fmt.Println("after state board")
-// 	fmt.Println(state.board)
-// 	assert.NotNil(t, node)
-// }
+func TestSearchEasy(t *testing.T) {
+	board := []int{1, 2, 0, 4, 5, 6, 3, 8, 9, 10, 7, 11, 13, 14, 15, 12}
+	state := NewState()
+	state.board = board
+	fmt.Println("before state board")
+	fmt.Println(state.board)
+	srh := NewSearch(state)
+	node := srh.IDAStar(5)
+	fmt.Println("after state board")
+	fmt.Println(state.board)
+	assert.NotNil(t, node)
+	assert.Equal(t, node.state.board, startingPoint(4))
+}

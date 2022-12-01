@@ -1,4 +1,4 @@
-package gofast
+package main
 
 import "fmt"
 
@@ -11,6 +11,7 @@ type SearchState struct {
 
 // Transition given vertical board to horizontal representation of the given board
 func calculateHorizontalBoard(board []int) []int {
+	board = startingPoint(4)
 	horizontalBoard := make([]int, len(board))
 	copy(horizontalBoard, board)
 	// make the board list be a horizontal representation of the puzzle board
@@ -38,7 +39,7 @@ func invertDistance(board []int) int {
 			}
 		}
 	}
-	vertical := inv/3 + inv%3
+	vertical := inv/3 + 1
 
 	horizontalBoard := calculateHorizontalBoard(board)
 	// calculate the horizontal inversions
@@ -57,7 +58,7 @@ func invertDistance(board []int) int {
 			inv += abs(id - i)
 		}
 	}
-	horizontal := inv/3 + inv%3
+	horizontal := inv/3 + 1
 
 	// sum horizontal and vertical distance to get the sum of invert distance
 	return vertical + horizontal
@@ -249,7 +250,7 @@ func (search *SearchState) invertDistanceFromMove() int {
 			toIndex := search.findIndexHorizontal(board[move.emptyIndex])
 			idx := toIndex - 1
 			tile := search.horizontalBoard[emptyIndex]
-			for idx < emptyIndex {
+			for idx > emptyIndex {
 				if search.horizontalBoard[idx] > tile { // tätä kutsutaan 3 kertaa indexeillä 2,3,4
 					count--
 				} else {

@@ -1,4 +1,4 @@
-package gofast
+package main
 
 import (
 	b64 "encoding/base64"
