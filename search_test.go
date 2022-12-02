@@ -71,16 +71,20 @@ func TestSearchEasy(t *testing.T) {
 	assert.Equal(t, node.state.board, startingPoint(4))
 }
 
-func TestSearchBug(t *testing.T) {
+func TestSearchBugs(t *testing.T) {
 	board := []int{1, 2, 3, 4, 5, 6, 7, 8, 0, 9, 10, 12, 13, 14, 11, 15}	
 	state := NewState()
 	state.board = board
-	fmt.Println("before state board")
-	fmt.Println(state.board)
 	srh := NewSearch(state)
 	node := srh.IDAStar(5)
-	fmt.Println("after state board")
-	fmt.Println(state.board)
+	assert.NotNil(t, node)
+	assert.Equal(t, node.state.board, startingPoint(4))
+
+	board = []int{5, 1, 2, 4, 9, 6, 3, 8, 13, 10, 7, 11, 0, 14, 15, 12}
+	state = NewState()
+	state.board = board
+	srh = NewSearch(state)
+	node = srh.IDAStar(5)
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
 }

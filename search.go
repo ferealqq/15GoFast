@@ -8,11 +8,13 @@ type SearchState struct {
 	state           *State
 	memoInvertDistance MemoizedFunction[int,[]int]
 	findIndexHorizontal MemoizedFunction[int,int]
+	hasSeen 				[]string
+	states					[]*State
 }
 
 type MemoizedFunction[T interface{}, R interface{}] func(R) T
 
-var memoCalled = 0
+// var memoCalled = 
 
 // because we are doing alot of expensive or semi expensive calculations. It's prefered that we memoize the values that these calls return rather than we call the operations with same values again and again
 func memoizeBoardCalculation[T interface{}, R interface{}](fn MemoizedFunction[T,R]) MemoizedFunction[T,R] {
@@ -20,8 +22,8 @@ func memoizeBoardCalculation[T interface{}, R interface{}](fn MemoizedFunction[T
 
 	return func(input R) T {
 		if val, found := cache[input]; found {
-			memoCalled++;
-			fmt.Printf("memo called %d \n", memoCalled)
+			// memoCalled++;
+			// fmt.Printf("memo called %d \n", memoCalled)
 			return val
 		}
 		val := fn(input)
@@ -160,6 +162,7 @@ func (search *SearchState) IDASearch(cutoff int, startDepth int) (STATUS, int, *
 		next := sts[i]
 		// idea if has seen next why bother calculating? we can maybe use cache to store that hash and the state so we don't have to recalculate the whole thing if it has seen the current
 		search.state = next 
+		search.hasSeen = append(search.hasSeen, hash(next.board))
 		status, probableCutoff, node := search.IDASearch(cutoff, startDepth+1)
 		if status == CUTOFF {
 			stop = true
@@ -167,6 +170,7 @@ func (search *SearchState) IDASearch(cutoff int, startDepth int) (STATUS, int, *
 		} else if status == SUCCESS {
 			return status, 0, node
 		}
+		search.hasSeen = search.hasSeen[:len(search.hasSeen)-1]
 	}
 	if stop {
 		fmt.Println("returning cutoff")
