@@ -4,33 +4,31 @@ import "fmt"
 
 // Contains all the important variables for the search
 type SearchState struct {
-	heuristic       int
-	state           *State
-	memoInvertDistance MemoizedFunction[int,[]int]
-	findIndexHorizontal MemoizedFunction[int,int]
-	hasSeen 				[]string
-	states					[]*State
+	heuristic           int
+	state               *State
+	memoInvertDistance  MemoizedFunction[int, []int]
+	findIndexHorizontal MemoizedFunction[int, int]
+	hasSeen             []string
+	states              []*State
+	walkingDistance			func([]int) int
 }
 
 type MemoizedFunction[T interface{}, R interface{}] func(R) T
 
-// var memoCalled = 
 
 // because we are doing alot of expensive or semi expensive calculations. It's prefered that we memoize the values that these calls return rather than we call the operations with same values again and again
-func memoizeBoardCalculation[T interface{}, R interface{}](fn MemoizedFunction[T,R]) MemoizedFunction[T,R] {
+func memoizeBoardCalculation[T interface{}, R interface{}](fn MemoizedFunction[T, R]) MemoizedFunction[T, R] {
 	cache := make(map[interface{}]T)
 
 	return func(input R) T {
 		if val, found := cache[input]; found {
-			// memoCalled++;
-			// fmt.Printf("memo called %d \n", memoCalled)
 			return val
 		}
 		val := fn(input)
 		cache[input] = fn(input)
 		return val
-	} 
-} 
+	}
+}
 
 // Transition given vertical board to horizontal representation of the given board
 func calculateHorizontalBoard(rowSize int) []int {
@@ -79,7 +77,7 @@ func invertDistance(board []int) int {
 	inv = 0
 	for i := range board {
 		// true value of the node so we have to minus one
-		value := board[i] 
+		value := board[i]
 		if value != -1 {
 			id := 0
 			for j := range memoHorizontalBoard {
@@ -105,11 +103,14 @@ type Node struct {
 
 // create a new search struct from a state
 func NewSearch(state *State) *SearchState {
+	wd := NewWD(state.size)
 	srh := &SearchState{
-		state:     state,
-		heuristic: invertDistance(state.board),
-		memoInvertDistance: memoizeBoardCalculation(invertDistance),
+		state:               state,
+		heuristic:           invertDistance(state.board),
+		memoInvertDistance:  memoizeBoardCalculation(invertDistance),
 		findIndexHorizontal: memoizeBoardCalculation(findIndexInHorizontalBoard),
+		// memoize walking distance?
+		walkingDistance: 		 wd.Calculate,
 	}
 
 	return srh
@@ -143,7 +144,7 @@ const CUTOFF = STATUS(2)
 
 // IDASearch
 func (search *SearchState) IDASearch(cutoff int, startDepth int) (STATUS, int, *Node) {
-	h := invertDistance(search.state.board)
+	h := search.walkingDistance(search.state.board)
 	f := h + startDepth
 	if f > cutoff {
 		return 0, 1, &Node{
@@ -161,28 +162,39 @@ func (search *SearchState) IDASearch(cutoff int, startDepth int) (STATUS, int, *
 	for i := range sts {
 		next := sts[i]
 		// idea if has seen next why bother calculating? we can maybe use cache to store that hash and the state so we don't have to recalculate the whole thing if it has seen the current
-		search.state = next 
+		search.state = next
 		search.hasSeen = append(search.hasSeen, hash(next.board))
-		status, probableCutoff, node := search.IDASearch(cutoff, startDepth+1)
+		search.states = append(search.states, next)
+		status, _, node := search.IDASearch(cutoff, startDepth+1)
 		if status == CUTOFF {
 			stop = true
-			nextCutoff = probableCutoff
+			// kun täs kutsuu nextiä niin jos search.state muuttuu niin mutatoiko se myös nextiä?
+			nextCutoff = search.walkingDistance(next.board)
 		} else if status == SUCCESS {
 			return status, 0, node
 		}
+		// remove last item from the seen list
 		search.hasSeen = search.hasSeen[:len(search.hasSeen)-1]
+		search.states = search.states[:len(search.states)-1]
 	}
 	if stop {
-		fmt.Println("returning cutoff")
 		return CUTOFF, nextCutoff, nil
 	}
-	current.heuristic = current.invertDistanceFromMove()
 	if current.isSuccess() {
 		return SUCCESS, 0, current
 	}
-	fmt.Println("returning board")
-	fmt.Println(current.state.board)
 	return -1, 0, current
+}
+
+func (search *SearchState) printMoves() {
+	for i, s := range search.states {
+		if s.move != nil {
+			fmt.Printf(" %s ", s.move.directionString())
+		}
+		if i == len(search.states)-1 {
+			fmt.Printf("\n")
+		}
+	}
 }
 
 func (search *SearchState) isSuccess() bool {

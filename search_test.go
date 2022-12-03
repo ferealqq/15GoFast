@@ -8,12 +8,13 @@ import (
 )
 
 func TestInversionDistance(t *testing.T) {
-	board := []int{1, 2, 4, 8, 9, 5, 10, 3, 7, 14, 6, 12, 13, 0, 11, 15}
-	// state := NewSearch(NewState())
+	board := startingPoint(4)
+	for i, j := 0, len(board)-1; i < j; i, j = i+1, j-1 {
+		board[i], board[j] = board[j], board[i]
+	}
 	inv1 := invertDistance(board)
 	// https://web.archive.org/web/20141224035932/http://juropollo.xe0.ru/stp_wd_translation_en.htm
-	// TODO Not sure that the math behind this is correct, might have to check later
-	assert.Equal(t, inv1, 32)
+	assert.Equal(t, inv1, 70)
 }
 
 func TestHorizontal(t *testing.T) {
@@ -42,41 +43,144 @@ func TestHorizontal(t *testing.T) {
 	assert.Equal(t, trans, to)
 }
 
-func TestSearchRandom(t *testing.T) {
-	st, _ := GenerateState(7)
+func TestSearchRandomFastEasy(t *testing.T) {
+	st, _ := GenerateState(20)
 	board := st.board
 	state := NewState()
 	state.board = board
-	fmt.Println("before state board")
-	fmt.Println(state.board)
 	srh := NewSearch(state)
 	node := srh.IDAStar(5)
-	fmt.Println("after state board")
-	fmt.Println(state.board)
+	node.printMoves()
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
 }
+
+func TestSearchRandomFast40(t *testing.T) {
+	st, _ := GenerateState(40)
+	board := st.board
+	state := NewState()
+	state.board = board
+	srh := NewSearch(state)
+	node := srh.IDAStar(5)
+	node.printMoves()
+	assert.NotNil(t, node)
+	assert.Equal(t, node.state.board, startingPoint(4))
+}
+
+func TestOptm(t *testing.T) {
+	board := []int{10, 9, 0, 4, 13, 11, 2, 8, 6, 3, 7, 12, 5, 1, 14, 15}
+	fmt.Println(board)
+	state := NewState()
+	state.board = board
+	srh := NewSearch(state)
+	node := srh.IDAStar(5)
+	node.printMoves()
+	assert.NotNil(t, node)
+	assert.Equal(t, node.state.board, startingPoint(4))
+}
+
+func TestSearchRandomFastMedium(t *testing.T) {
+	st, _ := GenerateState(50)
+	board := st.board
+	state := NewState()
+	state.board = board
+	srh := NewSearch(state)
+	node := srh.IDAStar(5)
+	node.printMoves()
+	assert.NotNil(t, node)
+	assert.Equal(t, node.state.board, startingPoint(4))
+}
+
+func TestSearchRandomFastHard(t *testing.T) {
+	st, _ := GenerateState(70)
+	board := st.board
+	state := NewState()
+	state.board = board
+	srh := NewSearch(state)
+	node := srh.IDAStar(5)
+	node.printMoves()
+	assert.NotNil(t, node)
+	assert.Equal(t, node.state.board, startingPoint(4))
+}
+
+// named slow so that grouping test runs are easier
+func TestSearchRandomSlowHard(t *testing.T) {
+	st, _ := GenerateState(100)
+	board := st.board
+	state := NewState()
+	state.board = board
+	srh := NewSearch(state)
+	node := srh.IDAStar(5)
+	node.printMoves()
+	assert.NotNil(t, node)
+	assert.Equal(t, node.state.board, startingPoint(4))
+}
+
+func TestSearchRandomSlowHarder(t *testing.T) {
+	st, _ := GenerateState(150)
+	board := st.board
+	state := NewState()
+	state.board = board
+	srh := NewSearch(state)
+	node := srh.IDAStar(5)
+	node.printMoves()
+	assert.NotNil(t, node)
+	assert.Equal(t, node.state.board, startingPoint(4))
+}
+
+func TestSearchRandomVeryHard(t *testing.T) {
+	st, _ := GenerateState(300)
+	board := st.board
+	state := NewState()
+	state.board = board
+	srh := NewSearch(state)
+	node := srh.IDAStar(5)
+	node.printMoves()
+	assert.NotNil(t, node)
+	assert.Equal(t, node.state.board, startingPoint(4))
+}
+
 
 func TestSearchEasy(t *testing.T) {
 	board := []int{1, 2, 0, 4, 5, 6, 3, 8, 9, 10, 7, 11, 13, 14, 15, 12}
 	state := NewState()
 	state.board = board
-	fmt.Println("before state board")
 	fmt.Println(state.board)
 	srh := NewSearch(state)
 	node := srh.IDAStar(5)
-	fmt.Println("after state board")
 	fmt.Println(state.board)
+	assert.NotNil(t, node)
+	assert.Equal(t, node.state.board, startingPoint(4))
+
+	node.printMoves()
+}
+
+func TestSearchStuck(t *testing.T){
+	board := []int{5, 1, 2, 3, 9, 6, 8, 4, 13, 10, 7, 12, 14, 11, 15, 0}
+	state := NewState()
+	state.board = board
+	srh := NewSearch(state)
+	node := srh.IDAStar(5)
+	node.printMoves()
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
 }
 
 func TestSearchBugs(t *testing.T) {
-	board := []int{1, 2, 3, 4, 5, 6, 7, 8, 0, 9, 10, 12, 13, 14, 11, 15}	
+	board := []int{1, 2, 3, 4, 5, 6, 7, 8, 0, 9, 10, 12, 13, 14, 11, 15}
 	state := NewState()
 	state.board = board
 	srh := NewSearch(state)
 	node := srh.IDAStar(5)
+	assert.NotNil(t, node)
+	assert.Equal(t, node.state.board, startingPoint(4))
+	node.printMoves()
+	board = []int{5, 1, 2, 3, 9, 6, 8, 4, 13, 10, 7, 12, 14, 11, 15, 0}
+	state = NewState()
+	state.board = board
+	srh = NewSearch(state)
+	node = srh.IDAStar(5)
+	node.printMoves()
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
 

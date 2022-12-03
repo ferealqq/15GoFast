@@ -3,6 +3,7 @@ package main
 import (
 	b64 "encoding/base64"
 	"errors"
+	"fmt"
 	"math/rand"
 	"time"
 )
@@ -25,6 +26,33 @@ type Move struct {
 	emptyIndex int
 	toIndex    int
 	direction  t_direction
+}
+
+func (m *Move) directionString() string {
+	switch m.direction {
+	case DIRECTION_DOWN:
+		return "Down"
+	case DIRECTION_UP:
+		return "Up"
+	case DIRECTION_LEFT:
+		return "Left"
+	case DIRECTION_RIGHT:
+		return "Right"
+	}
+	return ""
+}
+
+func (m *Move) Print() {
+	switch m.direction {
+	case DIRECTION_DOWN:
+		fmt.Println("Down")
+	case DIRECTION_UP:
+		fmt.Println("Up")
+	case DIRECTION_LEFT:
+		fmt.Println("Left")
+	case DIRECTION_RIGHT:
+		fmt.Println("Right")
+	}
 }
 
 // State of the 15 puzzle board
