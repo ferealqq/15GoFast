@@ -8,8 +8,8 @@ type SearchState struct {
 	memoInvertDistance  MemoizedFunction[t_cell, []t_cell]
 	findIndexHorizontal MemoizedFunction[t_cell, t_cell]
 	hasSeen             map[string]*State
-	states							[]*State
-	walkingDistance			func([]t_cell) int
+	states              []*State
+	walkingDistance     func([]t_cell) int
 }
 
 // node struct of search state, this helps the idastar algorithm to keep track of the depth the algorithm has gone through
@@ -22,12 +22,9 @@ type Node struct {
 func NewSearch(state *State) *SearchState {
 	wd := NewWD(int(state.size))
 	srh := &SearchState{
-		state:               state,
-		memoInvertDistance:  memoizeBoardCalculation(invertDistance),
-		findIndexHorizontal: memoizeBoardCalculation(findIndexInHorizontalBoard),
-		// memoize walking distance?
-		walkingDistance: 		 wd.Calculate,
-		hasSeen: make(map[string]*State),
+		state:           state,
+		walkingDistance: wd.Calculate,
+		hasSeen:         make(map[string]*State),
 	}
 
 	return srh
@@ -74,16 +71,16 @@ func (search *SearchState) IDASearch(cutoff t_cell, cost t_cell) (STATUS, t_cell
 	var current *State
 	stop := false
 	nextCutoff := cutoff
-	for _,next := range state.GetValidStates() {
+	for _, next := range state.GetValidStates() {
 		key := hash(next.board)
-		if _, ok := search.hasSeen[key]; ok  {
+		if _, ok := search.hasSeen[key]; ok {
 			continue
 		}
 		search.states = append(search.states, next)
 		search.hasSeen[key] = next
 		status, probCut := search.IDASearch(cutoff, cost+1)
-		if stop == false || probCut < nextCutoff { 
-			stop = true 
+		if stop == false || probCut < nextCutoff {
+			stop = true
 			nextCutoff = probCut
 			current = search.states[len(search.states)-1]
 		}
@@ -94,7 +91,7 @@ func (search *SearchState) IDASearch(cutoff t_cell, cost t_cell) (STATUS, t_cell
 			return status, 0
 		}
 		// remove last item from the seen list
-		delete(search.hasSeen, key);
+		delete(search.hasSeen, key)
 		search.states = search.states[:len(search.states)-1]
 	}
 

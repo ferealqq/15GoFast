@@ -10,6 +10,7 @@ import (
 
 // Describes how many rows the board has
 const BOARD_ROW_SIZE = t_cell(4)
+
 type t_cell = int16
 
 type t_direction int8
@@ -106,7 +107,7 @@ func GenerateState(complexity t_cell) (*State, error) {
 
 func startingPoint(size t_cell) []t_cell {
 	res := make([]t_cell, size*size)
-	
+
 	for i := t_cell(0); i < (size*size)-1; i++ {
 		res[i] = i + 1
 	}

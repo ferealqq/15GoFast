@@ -7,8 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-
-const maxDepth = t_cell(32767) 
+const maxDepth = t_cell(32767)
 
 func TestInversionDistance(t *testing.T) {
 	board := startingPoint(4)
@@ -71,7 +70,7 @@ func TestSearchRandomFast40(t *testing.T) {
 }
 
 func TestOptm(t *testing.T) {
-	// time to beat 0.7s, old was 1.1s 
+	// time to beat 0.7s, old was 1.1s
 	board := []t_cell{10, 9, 0, 4, 13, 11, 2, 8, 6, 3, 7, 12, 5, 1, 14, 15}
 	fmt.Println(board)
 	state := NewState()
@@ -149,7 +148,6 @@ func TestSearchRandomSlowVeryHard(t *testing.T) {
 	assert.Equal(t, node.state.board, startingPoint(4))
 }
 
-
 func TestSearchEasy(t *testing.T) {
 	board := []t_cell{1, 2, 0, 4, 5, 6, 3, 8, 9, 10, 7, 11, 13, 14, 15, 12}
 	state := NewState()
@@ -164,7 +162,7 @@ func TestSearchEasy(t *testing.T) {
 	node.printMoves()
 }
 
-func TestSearchStuck(t *testing.T){
+func TestSearchStuck(t *testing.T) {
 	board := []t_cell{5, 9, 11, 2, 1, 6, 15, 0, 13, 10, 4, 7, 14, 12, 8, 3}
 	fmt.Println(board)
 	state := NewState()

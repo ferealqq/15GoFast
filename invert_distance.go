@@ -103,8 +103,6 @@ func abs(x int) int {
 	return -x
 }
 
-
-
 // Evaluate the invert distance of t
 func invertDistance(board []t_cell) t_cell {
 	// theory of this heuristic evaluation is based on this article https://web.archive.org/web/20141224035932/http://juropollo.xe0.ru/stp_wd_translation_en.htm
@@ -145,7 +143,6 @@ func invertDistance(board []t_cell) t_cell {
 }
 
 type MemoizedFunction[T interface{}, R interface{}] func(R) T
-
 
 // because we are doing alot of expensive or semi expensive calculations. It's prefered that we memoize the values that these calls return rather than we call the operations with same values again and again
 func memoizeBoardCalculation[T interface{}, R interface{}](fn MemoizedFunction[T, R]) MemoizedFunction[T, R] {
