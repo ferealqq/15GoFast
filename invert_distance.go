@@ -2,9 +2,10 @@ package main
 
 // TODO: move this function to state.go
 func (search *SearchState) invertDistanceFromMove() t_cell {
+	// TODO fix this function
 	if search.state.move == nil {
 		// panic("can't calculate invert distance from a nil move in state. invertMoveDistance should always be called if the state.move value is set")
-		return search.heuristic
+		return 0
 	}
 	var count int = 0
 	/**
@@ -85,7 +86,7 @@ func (search *SearchState) invertDistanceFromMove() t_cell {
 			}
 		}
 	}
-	heur := search.heuristic
+	heur := t_cell(0)
 	if count < 0 {
 		heur += t_cell(abs(count) / 3)
 	} else {

@@ -102,7 +102,7 @@ func (wd *WalkingDistance) GenerateTable() *WalkingDistance {
 
 // calculate the walking distance from the given board
 func (wd *WalkingDistance) Calculate(board []t_cell) int {
-	heurestic := 0 
+	heurestic := 0
 	rowCode := 0 
 	colCode := 0 
 

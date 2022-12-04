@@ -4,7 +4,6 @@ import "fmt"
 
 // Contains all the important variables for the search
 type SearchState struct {
-	heuristic           t_cell
 	state               *State
 	memoInvertDistance  MemoizedFunction[t_cell, []t_cell]
 	findIndexHorizontal MemoizedFunction[t_cell, t_cell]
@@ -23,7 +22,6 @@ func NewSearch(state *State) *SearchState {
 	wd := NewWD(int(state.size))
 	srh := &SearchState{
 		state:               state,
-		heuristic:           invertDistance(state.board),
 		memoInvertDistance:  memoizeBoardCalculation(invertDistance),
 		findIndexHorizontal: memoizeBoardCalculation(findIndexInHorizontalBoard),
 		// memoize walking distance?
@@ -39,7 +37,10 @@ func (search *SearchState) IDAStar(maxDepth t_cell) *Node {
 	// TODO Figure out what we want to return when the calculations are a success
 	// https://en.wikipedia.org/wiki/Iterative_deepening_A*
 	var depth t_cell = 0 
-	cutoff := search.heuristic
+	// TODO Why does this work but not with walkingDistance?
+	cutoff := invertDistance(search.state.board)
+	// cutoff := t_cell(search.walkingDistance(search.state.board))
+
 	for depth < maxDepth {
 		status, cut, res := search.IDASearch(cutoff, depth)
 		if status == SUCCESS {
@@ -48,6 +49,7 @@ func (search *SearchState) IDAStar(maxDepth t_cell) *Node {
 			cutoff = cut
 		}
 		depth = res.depth
+		// fmt.Printf(" depth < maxDepth, %d < %d \n", depth, maxDepth)
 	}
 
 	return nil
@@ -63,9 +65,10 @@ const CUTOFF = STATUS(2)
 // IDASearch
 func (search *SearchState) IDASearch(cutoff t_cell, startDepth t_cell) (STATUS, t_cell, *Node) {
 	h := search.walkingDistance(search.state.board)
-	f := int16(h) + startDepth
+	f := t_cell(h) + startDepth
+	// fmt.Printf("f %d cutoff %d \n",f,cutoff)
 	if f > cutoff {
-		return 0, 1, &Node{
+		return 0, f, &Node{
 			*search,
 			startDepth,
 		}
@@ -87,23 +90,34 @@ func (search *SearchState) IDASearch(cutoff t_cell, startDepth t_cell) (STATUS, 
 		search.state = next
 		search.hasSeen[key] = next
 		status, _, node := search.IDASearch(cutoff, startDepth+1)
+		// if nextH := t_cell(node.walkingDistance(node.state.board)); nextH < nextCutoff { 
+		// 	stop = true 
+		// 	nextCutoff = nextH
+		// 	current = node 
+		// }
 		if status == CUTOFF {
 			stop = true
 			// kun täs kutsuu nextiä niin jos search.state muuttuu niin mutatoiko se myös nextiä?
 			nextCutoff = t_cell(search.walkingDistance(next.board))
+			// fmt.Printf("node depth %d \n",node.depth)
+			// current = node
 		} else if status == SUCCESS {
+			// fmt.Println("rekursiivinen palauttaa")
 			return status, 0, node
 		}
 		// remove last item from the seen list
 		delete(search.hasSeen, key);
 	}
 	if stop {
-		return CUTOFF, nextCutoff, nil
+		// fmt.Println("stop palauttaa")
+		return CUTOFF, nextCutoff, current
 	}
 	if current.isSuccess() {
+		// fmt.Println("isSuccess palauttaa")
 		return SUCCESS, 0, current
 	}
-	return -1, 0, current
+	// fmt.Println("normi palautusta vaa hinkataan")
+	return -1, nextCutoff, current
 }
 
 func (search *SearchState) printMoves() {
