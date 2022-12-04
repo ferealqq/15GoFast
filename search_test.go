@@ -3,11 +3,12 @@ package main
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
 
-const maxDepth = t_cell(32767)
+const maxRuntimeMS = time.Duration(1300)
 
 func TestInversionDistance(t *testing.T) {
 	board := startingPoint(4)
@@ -45,13 +46,23 @@ func TestHorizontal(t *testing.T) {
 	assert.Equal(t, trans, to)
 }
 
+func TestSearchTimeExceeds(t *testing.T) {
+	st, _ := GenerateState(9999)
+	board := st.board
+	state := NewState()
+	state.board = board
+	srh := NewSearch(state)
+	_, status := srh.IDAStar(time.Duration(10))
+	assert.Equal(t, status, TIME_EXCEEDED)
+}
+
 func TestSearchRandomFastEasy(t *testing.T) {
 	st, _ := GenerateState(20)
 	board := st.board
 	state := NewState()
 	state.board = board
 	srh := NewSearch(state)
-	node := srh.IDAStar(maxDepth)
+	node, _ := srh.IDAStar(maxRuntimeMS)
 	node.printMoves()
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
@@ -63,7 +74,7 @@ func TestSearchRandomFast40(t *testing.T) {
 	state := NewState()
 	state.board = board
 	srh := NewSearch(state)
-	node := srh.IDAStar(maxDepth)
+	node, _ := srh.IDAStar(maxRuntimeMS)
 	node.printMoves()
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
@@ -76,7 +87,7 @@ func TestOptm(t *testing.T) {
 	state := NewState()
 	state.board = board
 	srh := NewSearch(state)
-	node := srh.IDAStar(maxDepth)
+	node, _ := srh.IDAStar(maxRuntimeMS)
 	node.printMoves()
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
@@ -88,7 +99,7 @@ func TestSearchRandomFastMedium(t *testing.T) {
 	state := NewState()
 	state.board = board
 	srh := NewSearch(state)
-	node := srh.IDAStar(maxDepth)
+	node, _ := srh.IDAStar(maxRuntimeMS)
 	node.printMoves()
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
@@ -100,7 +111,7 @@ func TestSearchRandomFastHard(t *testing.T) {
 	state := NewState()
 	state.board = board
 	srh := NewSearch(state)
-	node := srh.IDAStar(maxDepth)
+	node, _ := srh.IDAStar(maxRuntimeMS)
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
 	node.printMoves()
@@ -115,7 +126,7 @@ func TestSearchRandomSlowHard(t *testing.T) {
 	state := NewState()
 	state.board = board
 	srh := NewSearch(state)
-	node := srh.IDAStar(70)
+	node, _ := srh.IDAStar(70)
 	node.printMoves()
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
@@ -129,7 +140,8 @@ func TestSearchRandomSlowHarder(t *testing.T) {
 	state := NewState()
 	state.board = board
 	srh := NewSearch(state)
-	node := srh.IDAStar(maxDepth)
+	// fails if runs over five seconds
+	node, _ := srh.IDAStar(time.Duration(5000))
 	node.printMoves()
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
@@ -142,7 +154,7 @@ func TestSearchRandomSlowVeryHard(t *testing.T) {
 	state := NewState()
 	state.board = board
 	srh := NewSearch(state)
-	node := srh.IDAStar(maxDepth)
+	node, _ := srh.IDAStar(maxRuntimeMS)
 	node.printMoves()
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
@@ -154,7 +166,7 @@ func TestSearchEasy(t *testing.T) {
 	state.board = board
 	fmt.Println(state.board)
 	srh := NewSearch(state)
-	node := srh.IDAStar(maxDepth)
+	node, _ := srh.IDAStar(maxRuntimeMS)
 	fmt.Println(state.board)
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
@@ -168,7 +180,7 @@ func TestSearchStuck(t *testing.T) {
 	state := NewState()
 	state.board = board
 	srh := NewSearch(state)
-	node := srh.IDAStar(70)
+	node, _ := srh.IDAStar(70)
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
 	node.printMoves()
@@ -179,7 +191,7 @@ func TestSearchBugs(t *testing.T) {
 	state := NewState()
 	state.board = board
 	srh := NewSearch(state)
-	node := srh.IDAStar(maxDepth)
+	node, _ := srh.IDAStar(maxRuntimeMS)
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
 	node.printMoves()
@@ -187,7 +199,7 @@ func TestSearchBugs(t *testing.T) {
 	state = NewState()
 	state.board = board
 	srh = NewSearch(state)
-	node = srh.IDAStar(maxDepth)
+	node, _ = srh.IDAStar(maxRuntimeMS)
 	node.printMoves()
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
@@ -196,7 +208,7 @@ func TestSearchBugs(t *testing.T) {
 	state = NewState()
 	state.board = board
 	srh = NewSearch(state)
-	node = srh.IDAStar(maxDepth)
+	node, _ = srh.IDAStar(maxRuntimeMS)
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
 }

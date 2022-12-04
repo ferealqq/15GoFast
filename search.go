@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 // Contains all the important variables for the search
 type SearchState struct {
@@ -30,26 +33,35 @@ func NewSearch(state *State) *SearchState {
 	return srh
 }
 
+type result struct {
+	status STATUS
+	cutoff t_cell
+}
+
 // Iterative Deepening A* search algorithm
-func (search *SearchState) IDAStar(maxDepth t_cell) *SearchState {
+func (search *SearchState) IDAStar(maxRuntimeMS time.Duration) (*SearchState, STATUS) {
 	// TODO Figure out what we want to return when the calculations are a success
 	// https://en.wikipedia.org/wiki/Iterative_deepening_A*
 	cutoff := t_cell(search.walkingDistance(search.state.board))
 	search.states = []*State{search.state}
 
-	// TODO don't use maxDepth let's use max time in milliseconds
-	for true {
-		status, cut := search.IDASearch(cutoff, t_cell(0))
-		if status == SUCCESS {
-			return search
-		} else if status == CUTOFF {
-			cutoff = cut
-		} else if status == FAILURE {
-			return nil
+	quitTick := time.NewTicker(maxRuntimeMS * time.Millisecond)
+	defer quitTick.Stop()
+	for {
+		select {
+		case <-quitTick.C:
+			return search, TIME_EXCEEDED
+		default:
+			status, cut := search.IDASearch(cutoff, t_cell(0))
+			if status == SUCCESS {
+				return search, SUCCESS
+			} else if status == CUTOFF {
+				cutoff = cut
+			} else if status == FAILURE {
+				return search, FAILURE
+			}
 		}
 	}
-	fmt.Printf("didn't solve puzzle \n")
-	return nil
 }
 
 // Status constatns of the search state,
@@ -59,6 +71,7 @@ type STATUS = int8
 const FAILURE = STATUS(0)
 const SUCCESS = STATUS(1)
 const CUTOFF = STATUS(2)
+const TIME_EXCEEDED = STATUS(3)
 
 // IDASearch, returns STATUS, cutoff, cost
 func (search *SearchState) IDASearch(cutoff t_cell, cost t_cell) (STATUS, t_cell) {
