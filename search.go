@@ -4,13 +4,13 @@ import "fmt"
 
 // Contains all the important variables for the search
 type SearchState struct {
-	heuristic           int
+	heuristic           t_cell
 	state               *State
-	memoInvertDistance  MemoizedFunction[int, []int]
-	findIndexHorizontal MemoizedFunction[int, int]
+	memoInvertDistance  MemoizedFunction[t_cell, []t_cell]
+	findIndexHorizontal MemoizedFunction[t_cell, t_cell]
 	hasSeen             []string
 	states              []*State
-	walkingDistance			func([]int) int
+	walkingDistance			func([]t_cell) int
 }
 
 type MemoizedFunction[T interface{}, R interface{}] func(R) T
@@ -31,13 +31,13 @@ func memoizeBoardCalculation[T interface{}, R interface{}](fn MemoizedFunction[T
 }
 
 // Transition given vertical board to horizontal representation of the given board
-func calculateHorizontalBoard(rowSize int) []int {
+func calculateHorizontalBoard(rowSize t_cell) []t_cell {
 	board := startingPoint(rowSize)
-	horizontalBoard := make([]int, len(board))
+	horizontalBoard := make([]t_cell, len(board))
 	copy(horizontalBoard, board)
 	// make the board list be a horizontal representation of the puzzle board
-	for i := 0; i < int(BOARD_ROW_SIZE); i++ {
-		for j := 0; j < int(BOARD_ROW_SIZE); j++ {
+	for i := t_cell(0); i < BOARD_ROW_SIZE; i++ {
+		for j := t_cell(0); j < BOARD_ROW_SIZE; j++ {
 			horizontalBoard[i*BOARD_ROW_SIZE+j] = board[i+j*BOARD_ROW_SIZE]
 		}
 	}
@@ -47,31 +47,31 @@ func calculateHorizontalBoard(rowSize int) []int {
 
 var memoHorizontalBoard = calculateHorizontalBoard(BOARD_ROW_SIZE)
 
-func findIndexInHorizontalBoard(num int) int {
+func findIndexInHorizontalBoard(num t_cell) t_cell {
 	for i := range memoHorizontalBoard {
 		if memoHorizontalBoard[i] == num {
-			return i
+			return t_cell(i)
 		}
 	}
 	return -1
 }
 
 // Evaluate the invert distance of t
-func invertDistance(board []int) int {
+func invertDistance(board []t_cell) t_cell {
 	// theory of this heuristic evaluation is based on this article https://web.archive.org/web/20141224035932/http://juropollo.xe0.ru/stp_wd_translation_en.htm
 
 	// Calculate the vertical inversions
 	inv := 0
-	for i := 0; i < int(BOARD_ROW_SIZE*BOARD_ROW_SIZE); i++ {
+	for i := t_cell(0); i < BOARD_ROW_SIZE*BOARD_ROW_SIZE; i++ {
 		if board[i] != 0 {
-			for j := 0; j < i; j++ {
+			for j := t_cell(0); j < i; j++ {
 				if board[i] < board[j] {
 					inv++
 				}
 			}
 		}
 	}
-	vertical := inv/3 + 1
+	vertical := t_cell(inv/3 + 1)
 
 	// calculate the horizontal inversions
 	inv = 0
@@ -81,7 +81,7 @@ func invertDistance(board []int) int {
 		if value != -1 {
 			id := 0
 			for j := range memoHorizontalBoard {
-				if memoHorizontalBoard[j] == value {
+				if memoHorizontalBoard[j] == t_cell(value) {
 					id = j
 					break
 				}
@@ -89,7 +89,7 @@ func invertDistance(board []int) int {
 			inv += abs(id - i)
 		}
 	}
-	horizontal := inv/3 + 1
+	horizontal := t_cell(inv/3 + 1)
 
 	// sum horizontal and vertical distance to get the sum of invert distance
 	return vertical + horizontal
@@ -98,12 +98,12 @@ func invertDistance(board []int) int {
 // node struct of search state, this helps the idastar algorithm to keep track of the depth the algorithm has gone through
 type Node struct {
 	SearchState
-	depth int
+	depth t_cell
 }
 
 // create a new search struct from a state
 func NewSearch(state *State) *SearchState {
-	wd := NewWD(state.size)
+	wd := NewWD(int(state.size))
 	srh := &SearchState{
 		state:               state,
 		heuristic:           invertDistance(state.board),
@@ -117,10 +117,10 @@ func NewSearch(state *State) *SearchState {
 }
 
 // Iterative Deepening A* search algorithm
-func (search *SearchState) IDAStar(maxDepth int) *Node {
+func (search *SearchState) IDAStar(maxDepth t_cell) *Node {
 	// TODO Figure out what we want to return when the calculations are a success
 	// https://en.wikipedia.org/wiki/Iterative_deepening_A*
-	depth := 0
+	var depth t_cell = 0 
 	cutoff := search.heuristic
 	for depth < maxDepth {
 		status, cut, res := search.IDASearch(cutoff, depth)
@@ -143,9 +143,9 @@ const SUCCESS = STATUS(1)
 const CUTOFF = STATUS(2)
 
 // IDASearch
-func (search *SearchState) IDASearch(cutoff int, startDepth int) (STATUS, int, *Node) {
+func (search *SearchState) IDASearch(cutoff t_cell, startDepth t_cell) (STATUS, t_cell, *Node) {
 	h := search.walkingDistance(search.state.board)
-	f := h + startDepth
+	f := int16(h) + startDepth
 	if f > cutoff {
 		return 0, 1, &Node{
 			*search,
@@ -169,7 +169,7 @@ func (search *SearchState) IDASearch(cutoff int, startDepth int) (STATUS, int, *
 		if status == CUTOFF {
 			stop = true
 			// kun täs kutsuu nextiä niin jos search.state muuttuu niin mutatoiko se myös nextiä?
-			nextCutoff = search.walkingDistance(next.board)
+			nextCutoff = t_cell(search.walkingDistance(next.board))
 		} else if status == SUCCESS {
 			return status, 0, node
 		}
@@ -198,7 +198,7 @@ func (search *SearchState) printMoves() {
 }
 
 func (search *SearchState) isSuccess() bool {
-	for i := 0; i < BOARD_ROW_SIZE*BOARD_ROW_SIZE-1; i++ {
+	for i := t_cell(0); i < BOARD_ROW_SIZE*BOARD_ROW_SIZE-1; i++ {
 		if search.state.board[i] != i+1 {
 			return false
 		}
@@ -207,12 +207,12 @@ func (search *SearchState) isSuccess() bool {
 }
 
 // TODO: move this function to state.go
-func (search *SearchState) invertDistanceFromMove() int {
+func (search *SearchState) invertDistanceFromMove() t_cell {
 	if search.state.move == nil {
 		// panic("can't calculate invert distance from a nil move in state. invertMoveDistance should always be called if the state.move value is set")
 		return search.heuristic
 	}
-	count := 0
+	var count int = 0
 	/**
 		When moving a tile vertically, the total number of inversions can change by only -3, -1, +1, and +3 		- First note that a vertical move will shift the tile 3 positions forward or backwards in our line of tiles.
 		- There are two cases to consider, depending on the relative value of the three tiles we've skipped over:
@@ -293,9 +293,9 @@ func (search *SearchState) invertDistanceFromMove() int {
 	}
 	heur := search.heuristic
 	if count < 0 {
-		heur += abs(count) / 3
+		heur += t_cell(abs(count) / 3)
 	} else {
-		heur -= abs(count) / 3
+		heur -= t_cell(abs(count) / 3)
 	}
 
 	return heur

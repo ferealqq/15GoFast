@@ -47,10 +47,15 @@ func NewWD(rowSize int) *WalkingDistance {
 		size: rowSize,
 		bitLength: bits.Len(uint(rowSize)),
 	}
-	solvedArr := startingPoint(int(wd.size))
+	solvedArr := startingPoint(int16(wd.size))
+	ls := make([]int, 16)
+	for i := 0; i < 15; i++ {
+		ls[i] = int(solvedArr[i])
+	}
+
 	// map representation of solved values to used for faster lookup time 
 	wd.solved = make(map[int]int)
-	for i,val := range solvedArr {
+	for i,val := range ls {
 		wd.solved[val] = i 
 	}
 
@@ -96,7 +101,7 @@ func (wd *WalkingDistance) GenerateTable() *WalkingDistance {
 }
 
 // calculate the walking distance from the given board
-func (wd *WalkingDistance) Calculate(board []int) int {
+func (wd *WalkingDistance) Calculate(board []t_cell) int {
 	heurestic := 0 
 	rowCode := 0 
 	colCode := 0 
@@ -106,7 +111,7 @@ func (wd *WalkingDistance) Calculate(board []int) int {
 			continue
 		}
 		// index that the value should be set to 
-		corIdx := wd.solved[val]
+		corIdx := wd.solved[int(val)]
 		// vertical and horizontal indexs of the current position
 		xi, yi := i % wd.size, i / wd.size
 		// xCor = vertical index of the correct position
@@ -120,7 +125,7 @@ func (wd *WalkingDistance) Calculate(board []int) int {
 			// calculate vertical heursitic increments
 			for yInc := i+1; yInc < i - i%wd.size + wd.size; yInc++ {
 				if int(yInc) < len(board) {
-					yVal := wd.solved[board[yInc]]
+					yVal := wd.solved[int(board[int(yInc)])]
 					if yVal / wd.size == yi && yVal < corIdx {
 						heurestic += 2
 					}
@@ -132,7 +137,7 @@ func (wd *WalkingDistance) Calculate(board []int) int {
 			// calculate horizontal heursitic increments
 			for xInc := i + wd.size; xInc < wd.size*wd.size; xInc+=4 {
 				if xInc < len(board) {
-					kVal := wd.solved[board[xInc]]
+					kVal := wd.solved[int(board[int(xInc)])]
 					if kVal % wd.size == xi && kVal < corIdx {
 						heurestic += 2
 					}

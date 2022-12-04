@@ -9,7 +9,8 @@ import (
 )
 
 // Describes how many rows the board has
-const BOARD_ROW_SIZE = 4
+const BOARD_ROW_SIZE = t_cell(4)
+type t_cell = int16
 
 type t_direction int8
 
@@ -23,8 +24,8 @@ const (
 
 // Describes what kind of a move has been executed
 type Move struct {
-	emptyIndex int
-	toIndex    int
+	emptyIndex t_cell
+	toIndex    t_cell
 	direction  t_direction
 }
 
@@ -57,9 +58,9 @@ func (m *Move) Print() {
 
 // State of the 15 puzzle board
 type State struct {
-	size       int
-	board      []int
-	complexity int
+	size       t_cell
+	board      []t_cell
+	complexity t_cell
 	move       *Move
 }
 
@@ -73,7 +74,7 @@ func NewState() *State {
 }
 
 // Genereates a State with a board that has shuffeled with N transitions where N is complexity
-func GenerateState(complexity int) (*State, error) {
+func GenerateState(complexity t_cell) (*State, error) {
 	// https://www.geeksforgeeks.org/check-instance-15-puzzle-solvable/
 	state := NewState()
 	visited := []string{}
@@ -103,11 +104,11 @@ func GenerateState(complexity int) (*State, error) {
 	return state, nil
 }
 
-func startingPoint(size int) []int {
-	res := make([]int, size*size)
-
-	for i := 0; int(i) < (size*size)-1; i++ {
-		res[i] = int(i + 1)
+func startingPoint(size t_cell) []t_cell {
+	res := make([]t_cell, size*size)
+	
+	for i := t_cell(0); i < (size*size)-1; i++ {
+		res[i] = i + 1
 	}
 
 	return res
@@ -134,7 +135,7 @@ func (state *State) GetValidStates() []*State {
 	var states = []*State{}
 
 	// get emtpy index from the board
-	emptyIndex := GetElementIndex(state.board, 0)
+	emptyIndex := t_cell(GetElementIndex(state.board, 0))
 
 	// the basic logic of puzzle 15 game is that you cannot move off the grid 16x16
 	// and you have to move one step at the time at 16x16 grid. Which means that you have to move either +1 -1 +4 -4
@@ -149,7 +150,7 @@ func (state *State) GetValidStates() []*State {
 		}))
 	}
 	// Not on last line
-	if emptyIndex+state.size < len(state.board) {
+	if emptyIndex+state.size < t_cell(len(state.board)) {
 		states = append(states, state.newSwap(&Move{
 			emptyIndex,
 			emptyIndex + state.size,
@@ -179,7 +180,7 @@ func (state *State) GetValidStates() []*State {
 // swaps the two elements in the given indexes for a new state
 func (state *State) newSwap(move *Move) *State {
 	// we have to create a copy of the board because otherwise they will be linked with a pointer
-	boardCopy := make([]int, len(state.board))
+	boardCopy := make([]t_cell, len(state.board))
 	copy(boardCopy, state.board)
 	newState := &State{
 		board:      boardCopy,
@@ -194,7 +195,7 @@ func (state *State) newSwap(move *Move) *State {
 }
 
 // create a unique value for the board represented as string
-func hash(board []int) string {
+func hash(board []t_cell) string {
 	var bs = make([]byte, len(board))
 	for i := 0; i < len(board); i++ {
 		bs[i] = byte(board[i])

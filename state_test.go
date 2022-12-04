@@ -12,13 +12,13 @@ func TestNewSwap(t *testing.T) {
 	state := NewState()
 
 	new := state.newSwap(&Move{
-		len(state.board) - 1,
+		t_cell(len(state.board) - 1),
 		1,
 		DIRECTION_DOWN,
 	})
 
-	assert.Equal(t, new.board[1], 0)
-	assert.Equal(t, state.board[1], 2)
+	assert.Equal(t, new.board[1], t_cell(0))
+	assert.Equal(t, state.board[1], t_cell(2))
 
 	assert.Equal(t, new.complexity-1, state.complexity)
 }
@@ -58,7 +58,7 @@ func TestGenerateState(t *testing.T) {
 func getInv(arr []int) int {
 	total := BOARD_ROW_SIZE * BOARD_ROW_SIZE
 	inv := 0
-	for i := 0; i < total-1; i++ {
+	for i := t_cell(0); i < total-1; i++ {
 		for j := i + 1; j < total; j++ {
 			if arr[i] > arr[j] {
 				inv++

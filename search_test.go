@@ -14,18 +14,18 @@ func TestInversionDistance(t *testing.T) {
 	}
 	inv1 := invertDistance(board)
 	// https://web.archive.org/web/20141224035932/http://juropollo.xe0.ru/stp_wd_translation_en.htm
-	assert.Equal(t, inv1, 70)
+	assert.Equal(t, inv1, t_cell(70))
 }
 
 func TestHorizontal(t *testing.T) {
-	board := []int{
+	board := []t_cell{
 		1, 2, 4, 8,
 		9, 5, 10, 3,
 		7, 14, 6, 12,
 		13, 0, 11, 15,
 	}
 
-	trans := make([]int, len(board))
+	trans := make([]t_cell, len(board))
 	copy(trans, board)
 	for i := 0; i < 4; i++ {
 		for j := 0; j < 4; j++ {
@@ -33,7 +33,7 @@ func TestHorizontal(t *testing.T) {
 		}
 	}
 
-	to := []int{
+	to := []t_cell{
 		1, 9, 7, 13,
 		2, 5, 14, 0,
 		4, 10, 6, 11,
@@ -68,7 +68,7 @@ func TestSearchRandomFast40(t *testing.T) {
 }
 
 func TestOptm(t *testing.T) {
-	board := []int{10, 9, 0, 4, 13, 11, 2, 8, 6, 3, 7, 12, 5, 1, 14, 15}
+	board := []t_cell{10, 9, 0, 4, 13, 11, 2, 8, 6, 3, 7, 12, 5, 1, 14, 15}
 	fmt.Println(board)
 	state := NewState()
 	state.board = board
@@ -105,6 +105,7 @@ func TestSearchRandomFastHard(t *testing.T) {
 
 // named slow so that grouping test runs are easier
 func TestSearchRandomSlowHard(t *testing.T) {
+	t.Skip()
 	st, _ := GenerateState(100)
 	board := st.board
 	state := NewState()
@@ -117,6 +118,7 @@ func TestSearchRandomSlowHard(t *testing.T) {
 }
 
 func TestSearchRandomSlowHarder(t *testing.T) {
+	t.Skip()
 	st, _ := GenerateState(150)
 	board := st.board
 	state := NewState()
@@ -129,6 +131,7 @@ func TestSearchRandomSlowHarder(t *testing.T) {
 }
 
 func TestSearchRandomVeryHard(t *testing.T) {
+	t.Skip()
 	st, _ := GenerateState(300)
 	board := st.board
 	state := NewState()
@@ -142,7 +145,7 @@ func TestSearchRandomVeryHard(t *testing.T) {
 
 
 func TestSearchEasy(t *testing.T) {
-	board := []int{1, 2, 0, 4, 5, 6, 3, 8, 9, 10, 7, 11, 13, 14, 15, 12}
+	board := []t_cell{1, 2, 0, 4, 5, 6, 3, 8, 9, 10, 7, 11, 13, 14, 15, 12}
 	state := NewState()
 	state.board = board
 	fmt.Println(state.board)
@@ -156,7 +159,7 @@ func TestSearchEasy(t *testing.T) {
 }
 
 func TestSearchStuck(t *testing.T){
-	board := []int{5, 1, 2, 3, 9, 6, 8, 4, 13, 10, 7, 12, 14, 11, 15, 0}
+	board := []t_cell{5, 1, 2, 3, 9, 6, 8, 4, 13, 10, 7, 12, 14, 11, 15, 0}
 	state := NewState()
 	state.board = board
 	srh := NewSearch(state)
@@ -167,7 +170,7 @@ func TestSearchStuck(t *testing.T){
 }
 
 func TestSearchBugs(t *testing.T) {
-	board := []int{1, 2, 3, 4, 5, 6, 7, 8, 0, 9, 10, 12, 13, 14, 11, 15}
+	board := []t_cell{1, 2, 3, 4, 5, 6, 7, 8, 0, 9, 10, 12, 13, 14, 11, 15}
 	state := NewState()
 	state.board = board
 	srh := NewSearch(state)
@@ -175,7 +178,7 @@ func TestSearchBugs(t *testing.T) {
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
 	node.printMoves()
-	board = []int{5, 1, 2, 3, 9, 6, 8, 4, 13, 10, 7, 12, 14, 11, 15, 0}
+	board = []t_cell{5, 1, 2, 3, 9, 6, 8, 4, 13, 10, 7, 12, 14, 11, 15, 0}
 	state = NewState()
 	state.board = board
 	srh = NewSearch(state)
@@ -184,7 +187,7 @@ func TestSearchBugs(t *testing.T) {
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
 
-	board = []int{5, 1, 2, 4, 9, 6, 3, 8, 13, 10, 7, 11, 0, 14, 15, 12}
+	board = []t_cell{5, 1, 2, 4, 9, 6, 3, 8, 13, 10, 7, 11, 0, 14, 15, 12}
 	state = NewState()
 	state.board = board
 	srh = NewSearch(state)
