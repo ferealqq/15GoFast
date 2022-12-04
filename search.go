@@ -8,6 +8,7 @@ type SearchState struct {
 	memoInvertDistance  MemoizedFunction[t_cell, []t_cell]
 	findIndexHorizontal MemoizedFunction[t_cell, t_cell]
 	hasSeen             map[string]*State
+	states							[]*State
 	walkingDistance			func([]t_cell) int
 }
 
@@ -33,25 +34,24 @@ func NewSearch(state *State) *SearchState {
 }
 
 // Iterative Deepening A* search algorithm
-func (search *SearchState) IDAStar(maxDepth t_cell) *Node {
+func (search *SearchState) IDAStar(maxDepth t_cell) *SearchState {
 	// TODO Figure out what we want to return when the calculations are a success
 	// https://en.wikipedia.org/wiki/Iterative_deepening_A*
-	var depth t_cell = 0 
-	// TODO Why does this work but not with walkingDistance?
-	cutoff := invertDistance(search.state.board)
-	// cutoff := t_cell(search.walkingDistance(search.state.board))
+	cutoff := t_cell(search.walkingDistance(search.state.board))
+	search.states = []*State{search.state}
 
-	for depth < maxDepth {
-		status, cut, res := search.IDASearch(cutoff, depth)
+	// TODO don't use maxDepth let's use max time in milliseconds
+	for true {
+		status, cut := search.IDASearch(cutoff, t_cell(0))
 		if status == SUCCESS {
-			return res
+			return search
 		} else if status == CUTOFF {
 			cutoff = cut
+		} else if status == FAILURE {
+			return nil
 		}
-		depth = res.depth
-		// fmt.Printf(" depth < maxDepth, %d < %d \n", depth, maxDepth)
 	}
-
+	fmt.Printf("didn't solve puzzle \n")
 	return nil
 }
 
@@ -59,65 +59,55 @@ func (search *SearchState) IDAStar(maxDepth t_cell) *Node {
 type STATUS = int8
 
 // These constants describe what is the current state of the search algorithm
+const FAILURE = STATUS(0)
 const SUCCESS = STATUS(1)
 const CUTOFF = STATUS(2)
 
-// IDASearch
-func (search *SearchState) IDASearch(cutoff t_cell, startDepth t_cell) (STATUS, t_cell, *Node) {
-	h := search.walkingDistance(search.state.board)
-	f := t_cell(h) + startDepth
-	// fmt.Printf("f %d cutoff %d \n",f,cutoff)
+// IDASearch, returns STATUS, cutoff, cost
+func (search *SearchState) IDASearch(cutoff t_cell, cost t_cell) (STATUS, t_cell) {
+	state := search.states[len(search.states)-1]
+	h := search.walkingDistance(state.board)
+	f := t_cell(h) + cost
 	if f > cutoff {
-		return 0, f, &Node{
-			*search,
-			startDepth,
-		}
+		return CUTOFF, f
 	}
-	current := &Node{
-		*search,
-		startDepth,
-	}
+	var current *State
 	stop := false
 	nextCutoff := cutoff
-	sts := search.state.GetValidStates()
-	for i := range sts {
-		next := sts[i]
+	for _,next := range state.GetValidStates() {
 		key := hash(next.board)
 		if _, ok := search.hasSeen[key]; ok  {
 			continue
 		}
-		// idea if has seen next why bother calculating? we can maybe use cache to store that hash and the state so we don't have to recalculate the whole thing if it has seen the current
-		search.state = next
+		search.states = append(search.states, next)
 		search.hasSeen[key] = next
-		status, _, node := search.IDASearch(cutoff, startDepth+1)
-		// if nextH := t_cell(node.walkingDistance(node.state.board)); nextH < nextCutoff { 
-		// 	stop = true 
-		// 	nextCutoff = nextH
-		// 	current = node 
-		// }
+		status, probCut := search.IDASearch(cutoff, cost+1)
+		if stop == false || probCut < nextCutoff { 
+			stop = true 
+			nextCutoff = probCut
+			current = search.states[len(search.states)-1]
+		}
 		if status == CUTOFF {
 			stop = true
-			// kun täs kutsuu nextiä niin jos search.state muuttuu niin mutatoiko se myös nextiä?
-			nextCutoff = t_cell(search.walkingDistance(next.board))
-			// fmt.Printf("node depth %d \n",node.depth)
-			// current = node
+			nextCutoff = probCut
 		} else if status == SUCCESS {
-			// fmt.Println("rekursiivinen palauttaa")
-			return status, 0, node
+			return status, 0
 		}
 		// remove last item from the seen list
 		delete(search.hasSeen, key);
+		search.states = search.states[:len(search.states)-1]
 	}
+
+	if current != nil && current.isSuccess() {
+		search.state = current
+		return SUCCESS, 0
+	}
+
 	if stop {
-		// fmt.Println("stop palauttaa")
-		return CUTOFF, nextCutoff, current
+		return CUTOFF, nextCutoff
 	}
-	if current.isSuccess() {
-		// fmt.Println("isSuccess palauttaa")
-		return SUCCESS, 0, current
-	}
-	// fmt.Println("normi palautusta vaa hinkataan")
-	return -1, nextCutoff, current
+
+	return FAILURE, -1
 }
 
 func (search *SearchState) printMoves() {
@@ -127,13 +117,4 @@ func (search *SearchState) printMoves() {
 		}
 	}
 	fmt.Printf("\n")
-}
-
-func (search *SearchState) isSuccess() bool {
-	for i := t_cell(0); i < BOARD_ROW_SIZE*BOARD_ROW_SIZE-1; i++ {
-		if search.state.board[i] != i+1 {
-			return false
-		}
-	}
-	return true
 }

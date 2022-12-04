@@ -202,3 +202,12 @@ func hash(board []t_cell) string {
 	}
 	return b64.StdEncoding.EncodeToString(bs)
 }
+
+func (state *State) isSuccess() bool {
+	for i := t_cell(0); i < BOARD_ROW_SIZE*BOARD_ROW_SIZE-1; i++ {
+		if state.board[i] != i+1 {
+			return false
+		}
+	}
+	return true
+}

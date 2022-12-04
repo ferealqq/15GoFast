@@ -8,7 +8,7 @@ import (
 )
 
 
-const maxDepth = 5 
+const maxDepth = t_cell(32767) 
 
 func TestInversionDistance(t *testing.T) {
 	board := startingPoint(4)
@@ -71,6 +71,7 @@ func TestSearchRandomFast40(t *testing.T) {
 }
 
 func TestOptm(t *testing.T) {
+	// time to beat 0.7s, old was 1.1s 
 	board := []t_cell{10, 9, 0, 4, 13, 11, 2, 8, 6, 3, 7, 12, 5, 1, 14, 15}
 	fmt.Println(board)
 	state := NewState()
@@ -101,9 +102,9 @@ func TestSearchRandomFastHard(t *testing.T) {
 	state.board = board
 	srh := NewSearch(state)
 	node := srh.IDAStar(maxDepth)
-	node.printMoves()
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
+	node.printMoves()
 }
 
 // named slow so that grouping test runs are easier
@@ -117,13 +118,12 @@ func TestSearchRandomSlowHard(t *testing.T) {
 	srh := NewSearch(state)
 	node := srh.IDAStar(70)
 	node.printMoves()
-	fmt.Println(node.depth)
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
 }
 
 func TestSearchRandomSlowHarder(t *testing.T) {
-	t.Skip()
+	// Running this test can take multiple seconds in the worst case
 	st, _ := GenerateState(150)
 	board := st.board
 	fmt.Println(board)
@@ -165,7 +165,6 @@ func TestSearchEasy(t *testing.T) {
 }
 
 func TestSearchStuck(t *testing.T){
-	t.Skip()
 	board := []t_cell{5, 9, 11, 2, 1, 6, 15, 0, 13, 10, 4, 7, 14, 12, 8, 3}
 	fmt.Println(board)
 	state := NewState()
