@@ -35,12 +35,12 @@ To build a redistributable, production mode package, use `wails build`.
 To test the core logic of the application run
 ```terminal
 go test . 
-```https://github.com/ferealqq/15GoFast/blob/main/documentation/weekly/week1.md
+```
 
 ## Reports
 
-[week 1](https://github.com/ferealqq/15GoFast/blob/main/documentation/weekly/week1.md)
-[week 2](https://github.com/ferealqq/15GoFast/blob/main/documentation/weekly/week2.md)
-[week 3](https://github.com/ferealqq/15GoFast/blob/main/documentation/weekly/week4.md)
-[week 4](https://github.com/ferealqq/15GoFast/blob/main/documentation/weekly/week4.md)
-[week 5](https://github.com/ferealqq/15GoFast/blob/main/documentation/weekly/week5.md)
+[week 1](https://github.com/ferealqq/15GoFast/blob/main/documentation/week1.md)
+[week 2](https://github.com/ferealqq/15GoFast/blob/main/documentation/week2.md)
+[week 3](https://github.com/ferealqq/15GoFast/blob/main/documentation/week4.md)
+[week 4](https://github.com/ferealqq/15GoFast/blob/main/documentation/week4.md)
+[week 5](https://github.com/ferealqq/15GoFast/blob/main/documentation/week5.md)
