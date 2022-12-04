@@ -43,3 +43,4 @@ go test .
 [week 2](https://github.com/ferealqq/15GoFast/blob/main/documentation/weekly/week2.md)
 [week 3](https://github.com/ferealqq/15GoFast/blob/main/documentation/weekly/week4.md)
 [week 4](https://github.com/ferealqq/15GoFast/blob/main/documentation/weekly/week4.md)
+[week 5](https://github.com/ferealqq/15GoFast/blob/main/documentation/weekly/week5.md)
