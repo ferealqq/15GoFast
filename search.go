@@ -110,6 +110,10 @@ func (search *SearchState) IDASearch(cutoff t_cell, cost t_cell) (STATUS, t_cell
 
 	if current != nil && current.isSuccess() {
 		search.state = current
+		// if the states does not contain the latest board add latest board to the states
+		if _, ok := search.hasSeen[hash(current.board)]; !ok {
+			search.states = append(search.states, current)
+		}
 		return SUCCESS, 0
 	}
 

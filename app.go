@@ -7,9 +7,15 @@ import (
 	"time"
 )
 
+
+const DEFAULT_COMPLEXITY = 100
+const DEFAULT_MAX_RUNTIME = 1300
 // App struct
 type App struct {
 	ctx context.Context
+	search *SearchState
+	complexity t_cell
+	maxRuntime time.Duration
 }
 
 // NewApp creates a new App application struct
@@ -21,6 +27,58 @@ func NewApp() *App {
 // so we can call the runtime methods
 func (app *App) startup(ctx context.Context) {
 	app.ctx = ctx
+	app.complexity = DEFAULT_COMPLEXITY
+	app.maxRuntime = time.Duration(DEFAULT_MAX_RUNTIME)
+	st,err := GenerateState(app.complexity)
+	if err != nil {
+		// TODO  ?
+		panic(err)
+	}
+	app.search = NewSearch(st)
+}
+// get current board in the app
+func (app *App) GetBoard() []t_cell {
+	return app.search.state.board
+}
+// generate new board with the app complexity 
+func (app *App) GenerateBoard() []t_cell {
+	st,err := GenerateState(app.complexity)
+	if err != nil {
+		// TODO  ?
+		panic(err)
+	}
+	app.search = NewSearch(st)
+	return app.GenerateBoard()
+}
+
+func (app *App) SetComplexity(comp t_cell) {
+	app.complexity = comp
+}
+
+func (app *App) SetMaxRuntime(milliseconds int) {
+	app.maxRuntime = time.Duration(milliseconds)
+}
+
+type SolveResult struct {
+	Status STATUS
+	Iterations [][]t_cell
+}
+
+// returns every iteration of the board while solving  
+func (app *App) Solve() SolveResult {
+	res,status := app.search.IDAStar(app.maxRuntime)
+	if status == SUCCESS {
+		boards := make([][]t_cell, len(res.states))
+		for i,state := range res.states {
+			boards[i] = state.board
+		}
+		return SolveResult{
+			SUCCESS,
+			boards,
+		}
+	}else{
+		return SolveResult{Status: status}
+	}
 }
 
 // Greet returns a greeting for the given name
