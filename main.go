@@ -1,6 +1,6 @@
 // Documentation of the 15Puzzle solver.
 // This documentation contains all public varibles used in the application
-package gofast
+package main
 
 import (
 	"embed"
