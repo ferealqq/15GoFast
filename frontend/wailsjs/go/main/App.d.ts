@@ -6,16 +6,8 @@ export function GenerateBoard():Promise<Array<number>>;
 
 export function GetBoard():Promise<Array<number>>;
 
-export function GetRandomMove(arg1:number):Promise<any>;
-
-export function GetValidPositions(arg1:number):Promise<Array<number>>;
-
-export function Greet(arg1:string):Promise<string>;
-
 export function SetComplexity(arg1:number):Promise<void>;
 
 export function SetMaxRuntime(arg1:number):Promise<void>;
 
 export function Solve():Promise<main.SolveResult>;
-
-export function ValidateMove(arg1:any,arg2:number):Promise<boolean>;

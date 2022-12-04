@@ -10,18 +10,6 @@ export function GetBoard() {
   return window['go']['main']['App']['GetBoard']();
 }
 
-export function GetRandomMove(arg1) {
-  return window['go']['main']['App']['GetRandomMove'](arg1);
-}
-
-export function GetValidPositions(arg1) {
-  return window['go']['main']['App']['GetValidPositions'](arg1);
-}
-
-export function Greet(arg1) {
-  return window['go']['main']['App']['Greet'](arg1);
-}
-
 export function SetComplexity(arg1) {
   return window['go']['main']['App']['SetComplexity'](arg1);
 }
@@ -32,8 +20,4 @@ export function SetMaxRuntime(arg1) {
 
 export function Solve() {
   return window['go']['main']['App']['Solve']();
-}
-
-export function ValidateMove(arg1, arg2) {
-  return window['go']['main']['App']['ValidateMove'](arg1, arg2);
 }
