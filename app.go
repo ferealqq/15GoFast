@@ -48,7 +48,7 @@ func (app *App) GenerateBoard() []t_cell {
 		panic(err)
 	}
 	app.search = NewSearch(st)
-	return app.GenerateBoard()
+	return app.GetBoard()
 }
 
 func (app *App) SetComplexity(comp t_cell) {

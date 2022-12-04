@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import { GetBoard, Solve } from "../wailsjs/go/main/App";
+import { GenerateBoard, GetBoard, Solve } from "../wailsjs/go/main/App";
 import { Text, Button, ChakraProvider, Grid, GridItem } from "@chakra-ui/react";
 
 const swagStyle = {
@@ -22,6 +22,7 @@ enum Status {
 function App() {
   const [puzzle, setPuzzle] = useState<undefined | number[]>();
   const [emptyIndex, setEmptyIndex] = useState<number | undefined>(undefined)
+  const [isSolving,setSolving] = useState(false)
 
   useEffect(() => {
     if (puzzle) {
@@ -39,11 +40,23 @@ function App() {
   },[]);
 
   const startSolveTransition = () => {
+    if(isSolving) return;
     Solve().then(result => {
       if (result.Status !== Status.SUCCESS) {
         alert("jotain meni pieleen yritä myöhemmin uudellen")
+      }else{
+        setSolving(true)
+        let count = 0;
+        const interval = setInterval(()=>{
+          if (count < result.Iterations.length) {
+            setPuzzle(result.Iterations[count])
+            count++
+          }else{
+            setSolving(false)
+            clearInterval(interval)
+          }
+        },300)
       }
-      setPuzzle(result.Iterations[result.Iterations.length-1])
     })
   }
   // swap the place of two columns in the react state
@@ -60,11 +73,22 @@ function App() {
         {/* FIXME: remove these are for debugging  */}
         <Text fontSize="5xl">Empty index {emptyIndex}</Text>
         <Button
+          padding={5}
+          margin={7}
           onClick={() => {
            startSolveTransition() 
           }}
         >
           Solve!
+        </Button>
+        <Button
+          padding={5}
+          margin={7}
+          onClick={() => {
+           GenerateBoard().then(board => setPuzzle(board))
+          }}
+        >
+          Reset!
         </Button>
         <Grid templateColumns="repeat(4, 4fr)" gap={6}>
           {!puzzle && <p>loading</p>}

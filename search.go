@@ -46,10 +46,12 @@ func (search *SearchState) IDAStar(maxRuntimeMS time.Duration) (*SearchState, ST
 	search.states = []*State{search.state}
 
 	quitTick := time.NewTicker(maxRuntimeMS * time.Millisecond)
+	fmt.Println("solving")
 	defer quitTick.Stop()
 	for {
 		select {
 		case <-quitTick.C:
+			fmt.Println("time limit exceeded")
 			return search, TIME_EXCEEDED
 		default:
 			status, cut := search.IDASearch(cutoff, t_cell(0))
