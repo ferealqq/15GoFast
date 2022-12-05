@@ -62,6 +62,7 @@ func (m *Move) Print() {
 type State struct {
 	size       t_cell
 	board      [16]t_cell
+	// TODO Depricated?
 	complexity t_int
 	move       *Move
 }
@@ -87,10 +88,13 @@ func GenerateState(complexity t_int) (*State, error) {
 		visited = append(visited, code(state.board))
 		sts := state.GetValidStates()
 		filtered := []*State{}
-		for i := range sts {
+		for _,next := range sts {
+			if next == nil {
+				continue
+			}
 			for j := range visited {
-				if visited[j] != code(sts[i].board) {
-					filtered = append(filtered, sts[i])
+				if visited[j] != code(next.board) {
+					filtered = append(filtered, next)
 					break
 				}
 			}
@@ -117,8 +121,7 @@ func startingPoint(size t_cell) [16]t_cell {
 }
 
 // Get the first index of a element in a given array, returns -1 if not found
-func GetElementIndex[T comparable](arr [16]T, element T) t_cell {
-	// get empty index
+func getElementIndex(arr [16]t_cell, element t_cell) t_cell {
 	for i := 0; i < len(arr); i++ {
 		if arr[i] == element {
 			return t_cell(i)
@@ -130,14 +133,14 @@ func GetElementIndex[T comparable](arr [16]T, element T) t_cell {
 // This code has to be very optimized, at the moment this will call too manu mutations
 
 // Calculate all the states that the current state can be mutated to
-func (state *State) GetValidStates() []*State {
+func (state *State) GetValidStates() [4]*State {
 	// This function is currently O(N^2) - O(N^N), where N = 4
 	// appned O(N)
 	// newSwap O(N)*
-	var states = []*State{}
+	var states [4]*State
 
 	// get emtpy index from the board
-	emptyIndex := GetElementIndex(state.board, t_cell(0))
+	emptyIndex := getElementIndex(state.board, t_cell(0))
 
 	// the basic logic of puzzle 15 game is that you cannot move off the grid 16x16
 	// and you have to move one step at the time at 16x16 grid. Which means that you have to move either +1 -1 +4 -4
@@ -145,35 +148,35 @@ func (state *State) GetValidStates() []*State {
 
 	// not on the first line
 	if emptyIndex-state.size >= 0 {
-		states = append(states, state.newSwap(&Move{
+		states[0] = state.newSwap(&Move{
 			emptyIndex,
 			emptyIndex - state.size,
 			DIRECTION_UP,
-		}))
+		})
 	}
 	// Not on last line
 	if emptyIndex+state.size < t_cell(len(state.board)) {
-		states = append(states, state.newSwap(&Move{
+		states[1] = state.newSwap(&Move{
 			emptyIndex,
 			emptyIndex + state.size,
 			DIRECTION_DOWN,
-		}))
+		})
 	}
 	// Not on right edge
 	if emptyIndex%state.size != state.size-1 {
-		states = append(states, state.newSwap(&Move{
+		states[2] = state.newSwap(&Move{
 			emptyIndex,
 			emptyIndex + 1,
 			DIRECTION_RIGHT,
-		}))
+		})
 	}
 	// Not on left edge
 	if emptyIndex%state.size != 0 {
-		states = append(states, state.newSwap(&Move{
+		states[3] = state.newSwap(&Move{
 			emptyIndex,
 			emptyIndex - 1,
 			DIRECTION_LEFT,
-		}))
+		})
 	}
 
 	return states

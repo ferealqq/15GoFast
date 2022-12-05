@@ -85,6 +85,9 @@ func (search *SearchState) IDASearch(cutoff t_int, cost t_int) (STATUS, t_int) {
 	stop := false
 	nextCutoff := cutoff
 	for _, next := range state.GetValidStates() {
+		if next == nil {
+			continue
+		}
 		key := code(next.board)
 		if _, ok := search.hasSeen[key]; ok {
 			continue

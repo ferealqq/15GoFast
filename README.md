@@ -46,7 +46,14 @@ Usage:
 go tool pprof "profile_file" 
 ```
 
-To generate use the following [guide](https://pkg.go.dev/runtime/pprof).
+To generate profile's use the following [guide](https://pkg.go.dev/runtime/pprof).
+
+Generate IDAStar's cpu profile run
+```terminal
+go clean --cache ; go clean -testcache ; go test -run "TestPerformance" -cpuprofile cpu.prof
+go tool pprof search.prof
+(pprof) web
+```
 
 ## Reports
 

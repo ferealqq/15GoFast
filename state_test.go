@@ -76,7 +76,7 @@ func isSolvable(board [16]t_cell) bool {
 	if BOARD_ROW_SIZE%2 == 1 {
 		return !(invCount%2 == 1)
 	} else {
-		pos := GetElementIndex(board, 0)
+		pos := getElementIndex(board, 0)
 		if pos%2 == 0 {
 			return !(invCount%2 == 0)
 		} else {
