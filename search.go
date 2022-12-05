@@ -8,17 +8,15 @@ import (
 // Contains all the important variables for the search
 type SearchState struct {
 	state               *State
-	memoInvertDistance  MemoizedFunction[t_cell, []t_cell]
-	findIndexHorizontal MemoizedFunction[t_cell, t_cell]
-	hasSeen             map[string]*State
+	hasSeen             map[int]*State
 	states              []*State
-	walkingDistance     func([]t_cell) int
+	walkingDistance     func([16]t_cell) int
 }
 
 // node struct of search state, this helps the idastar algorithm to keep track of the depth the algorithm has gone through
 type Node struct {
 	SearchState
-	depth t_cell
+	depth t_int
 }
 
 // create a new search struct from a state
@@ -27,7 +25,7 @@ func NewSearch(state *State) *SearchState {
 	srh := &SearchState{
 		state:           state,
 		walkingDistance: wd.Calculate,
-		hasSeen:         make(map[string]*State),
+		hasSeen:         make(map[int]*State),
 	}
 
 	return srh
@@ -35,14 +33,14 @@ func NewSearch(state *State) *SearchState {
 
 type result struct {
 	status STATUS
-	cutoff t_cell
+	cutoff t_int
 }
 
 // Iterative Deepening A* search algorithm
 func (search *SearchState) IDAStar(maxRuntimeMS time.Duration) (*SearchState, STATUS) {
 	// TODO Figure out what we want to return when the calculations are a success
 	// https://en.wikipedia.org/wiki/Iterative_deepening_A*
-	cutoff := t_cell(search.walkingDistance(search.state.board))
+	cutoff := t_int(search.walkingDistance(search.state.board))
 	search.states = []*State{search.state}
 
 	quitTick := time.NewTicker(maxRuntimeMS * time.Millisecond)
@@ -54,7 +52,7 @@ func (search *SearchState) IDAStar(maxRuntimeMS time.Duration) (*SearchState, ST
 			fmt.Println("time limit exceeded")
 			return search, TIME_EXCEEDED
 		default:
-			status, cut := search.IDASearch(cutoff, t_cell(0))
+			status, cut := search.IDASearch(cutoff, t_int(0))
 			if status == SUCCESS {
 				return search, SUCCESS
 			} else if status == CUTOFF {
@@ -76,10 +74,10 @@ const CUTOFF = STATUS(2)
 const TIME_EXCEEDED = STATUS(3)
 
 // IDASearch, returns STATUS, cutoff, cost
-func (search *SearchState) IDASearch(cutoff t_cell, cost t_cell) (STATUS, t_cell) {
+func (search *SearchState) IDASearch(cutoff t_int, cost t_int) (STATUS, t_int) {
 	state := search.states[len(search.states)-1]
 	h := search.walkingDistance(state.board)
-	f := t_cell(h) + cost
+	f := t_int(h) + cost
 	if f > cutoff {
 		return CUTOFF, f
 	}
@@ -87,7 +85,7 @@ func (search *SearchState) IDASearch(cutoff t_cell, cost t_cell) (STATUS, t_cell
 	stop := false
 	nextCutoff := cutoff
 	for _, next := range state.GetValidStates() {
-		key := hash(next.board)
+		key := code(next.board)
 		if _, ok := search.hasSeen[key]; ok {
 			continue
 		}
@@ -113,7 +111,7 @@ func (search *SearchState) IDASearch(cutoff t_cell, cost t_cell) (STATUS, t_cell
 	if current != nil && current.isSuccess() {
 		search.state = current
 		// if the states does not contain the latest board add latest board to the states
-		if _, ok := search.hasSeen[hash(current.board)]; !ok {
+		if _, ok := search.hasSeen[code(current.board)]; !ok {
 			search.states = append(search.states, current)
 		}
 		return SUCCESS, 0

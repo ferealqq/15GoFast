@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
+
+	_ "net/http/pprof"
 	"time"
 )
 
@@ -13,7 +15,7 @@ const DEFAULT_MAX_RUNTIME = 1300
 type App struct {
 	ctx        context.Context
 	search     *SearchState
-	complexity t_cell
+	complexity t_int
 	maxRuntime time.Duration
 }
 
@@ -37,12 +39,12 @@ func (app *App) startup(ctx context.Context) {
 }
 
 // get current board in the app
-func (app *App) GetBoard() []t_cell {
+func (app *App) GetBoard() [16]t_cell {
 	return app.search.state.board
 }
 
 // generate new board with the app complexity
-func (app *App) GenerateBoard() []t_cell {
+func (app *App) GenerateBoard() [16]t_cell {
 	st, err := GenerateState(app.complexity)
 	if err != nil {
 		// TODO  ?
@@ -52,7 +54,7 @@ func (app *App) GenerateBoard() []t_cell {
 	return app.GetBoard()
 }
 
-func (app *App) SetComplexity(comp t_cell) {
+func (app *App) SetComplexity(comp t_int) {
 	app.complexity = comp
 }
 
@@ -66,7 +68,7 @@ type IterationData struct {
 		ToIndex    t_cell
 		Direction  t_direction
 	}
-	Board []t_cell
+	Board [16]t_cell
 }
 
 type SolveResult struct {

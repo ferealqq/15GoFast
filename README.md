@@ -37,6 +37,17 @@ To test the core logic of the application run
 go test . 
 ```
 
+## Profiling 
+
+
+Profiling is done with [pprof](https://pkg.go.dev/runtime/pprof).
+Usage:
+```terminal
+go tool pprof "profile_file" 
+```
+
+To generate use the following [guide](https://pkg.go.dev/runtime/pprof).
+
 ## Reports
 
 [week 1](https://github.com/ferealqq/15GoFast/blob/main/documentation/week1.md)
@@ -44,3 +55,10 @@ go test .
 [week 3](https://github.com/ferealqq/15GoFast/blob/main/documentation/week4.md)
 [week 4](https://github.com/ferealqq/15GoFast/blob/main/documentation/week4.md)
 [week 5](https://github.com/ferealqq/15GoFast/blob/main/documentation/week5.md)
+
+
+## Documentation
+
+### Profiles 
+
+Profile files are [here](https://github.com/ferealqq/15GoFast/blob/main/profiles)

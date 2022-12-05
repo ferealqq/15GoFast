@@ -11,7 +11,8 @@ import (
 // Describes how many rows the board has
 const BOARD_ROW_SIZE = t_cell(4)
 
-type t_cell = int16
+type t_int = int16
+type t_cell = int8
 
 type t_direction int8
 
@@ -60,8 +61,8 @@ func (m *Move) Print() {
 // State of the 15 puzzle board
 type State struct {
 	size       t_cell
-	board      []t_cell
-	complexity t_cell
+	board      [16]t_cell
+	complexity t_int
 	move       *Move
 }
 
@@ -69,26 +70,26 @@ type State struct {
 func NewState() *State {
 	return &State{
 		size:       BOARD_ROW_SIZE,
-		board:      startingPoint(BOARD_ROW_SIZE),
+		board:      startingPoint(t_cell(BOARD_ROW_SIZE)),
 		complexity: 0,
 	}
 }
 
 // Genereates a State with a board that has shuffeled with N transitions where N is complexity
-func GenerateState(complexity t_cell) (*State, error) {
+func GenerateState(complexity t_int) (*State, error) {
 	// https://www.geeksforgeeks.org/check-instance-15-puzzle-solvable/
 	state := NewState()
-	visited := []string{}
+	visited := []int{}
 	olds := []*State{}
 
 	rand.Seed(time.Now().UnixNano())
 	for state.complexity < complexity {
-		visited = append(visited, hash(state.board))
+		visited = append(visited, code(state.board))
 		sts := state.GetValidStates()
 		filtered := []*State{}
 		for i := range sts {
 			for j := range visited {
-				if visited[j] != hash(sts[i].board) {
+				if visited[j] != code(sts[i].board) {
 					filtered = append(filtered, sts[i])
 					break
 				}
@@ -105,8 +106,8 @@ func GenerateState(complexity t_cell) (*State, error) {
 	return state, nil
 }
 
-func startingPoint(size t_cell) []t_cell {
-	res := make([]t_cell, size*size)
+func startingPoint(size t_cell) [16]t_cell {
+	var res [16]t_cell
 
 	for i := t_cell(0); i < (size*size)-1; i++ {
 		res[i] = i + 1
@@ -116,11 +117,11 @@ func startingPoint(size t_cell) []t_cell {
 }
 
 // Get the first index of a element in a given array, returns -1 if not found
-func GetElementIndex[T comparable](arr []T, element T) int {
+func GetElementIndex[T comparable](arr [16]T, element T) t_cell {
 	// get empty index
 	for i := 0; i < len(arr); i++ {
 		if arr[i] == element {
-			return i
+			return t_cell(i)
 		}
 	}
 	return -1
@@ -136,7 +137,7 @@ func (state *State) GetValidStates() []*State {
 	var states = []*State{}
 
 	// get emtpy index from the board
-	emptyIndex := t_cell(GetElementIndex(state.board, 0))
+	emptyIndex := GetElementIndex(state.board, t_cell(0))
 
 	// the basic logic of puzzle 15 game is that you cannot move off the grid 16x16
 	// and you have to move one step at the time at 16x16 grid. Which means that you have to move either +1 -1 +4 -4
@@ -181,8 +182,9 @@ func (state *State) GetValidStates() []*State {
 // swaps the two elements in the given indexes for a new state
 func (state *State) newSwap(move *Move) *State {
 	// we have to create a copy of the board because otherwise they will be linked with a pointer
-	boardCopy := make([]t_cell, len(state.board))
-	copy(boardCopy, state.board)
+	// boardCopy := make([]t_int, len(state.board))
+	var boardCopy [16]t_cell;
+	copy(boardCopy[:], state.board[:])
 	newState := &State{
 		board:      boardCopy,
 		size:       state.size,
@@ -196,7 +198,7 @@ func (state *State) newSwap(move *Move) *State {
 }
 
 // create a unique value for the board represented as string
-func hash(board []t_cell) string {
+func hash(board []t_int) string {
 	var bs = make([]byte, len(board))
 	for i := 0; i < len(board); i++ {
 		bs[i] = byte(board[i])
@@ -205,7 +207,8 @@ func hash(board []t_cell) string {
 }
 
 func (state *State) isSuccess() bool {
-	for i := t_cell(0); i < BOARD_ROW_SIZE*BOARD_ROW_SIZE-1; i++ {
+	size := t_cell(BOARD_ROW_SIZE*BOARD_ROW_SIZE-1)
+	for i := t_cell(0); i < size; i++ {
 		if state.board[i] != i+1 {
 			return false
 		}

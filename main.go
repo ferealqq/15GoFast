@@ -4,6 +4,10 @@ package main
 
 import (
 	"embed"
+	"log"
+	"net/http"
+
+	// _ "net/http/pprof"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -14,6 +18,9 @@ import (
 var assets embed.FS
 
 func main() {
+	go func() {
+		log.Println(http.ListenAndServe("localhost:6060", nil))
+	}()
 	// Create an instance of the app structure
 	app := NewApp()
 
@@ -36,3 +43,38 @@ func main() {
 		println("Error:", err.Error())
 	}
 }
+
+
+// func main() {
+// 	maxRuntimeMS := time.Duration(1500)
+// 	st, _ := GenerateState(70)
+// 	board := st.board
+// 	state := NewState()
+// 	state.board = board
+// 	fmt.Println("Started sovling board")
+// 	fmt.Println(board)
+// 	srh := NewSearch(state)
+// 	node, _ := srh.IDAStar(maxRuntimeMS)
+// 	if !node.state.isSuccess() {
+// 		fmt.Println("Failed solving board")
+// 	}else{
+// 		fmt.Println("Solved")
+// 	}
+
+// 	maxRuntimeMS = time.Duration(2600)
+// 	st, _ = GenerateState(135)
+// 	board = st.board
+// 	state = NewState()
+// 	state.board = board
+// 	fmt.Println("Started sovling board")
+// 	fmt.Println(board)
+// 	srh = NewSearch(state)
+// 	node, _ = srh.IDAStar(maxRuntimeMS)
+// 	if !node.state.isSuccess() {
+// 		fmt.Println("Failed solving board")
+// 	}else{
+// 		fmt.Println("Solved")
+// 	}
+
+// 	log.Println(http.ListenAndServe("localhost:6060", nil))
+// }

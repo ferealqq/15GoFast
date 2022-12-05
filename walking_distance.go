@@ -6,13 +6,13 @@ import (
 )
 
 type visitSt struct {
-	cost  int8
-	board [16]int8
-	e     int8
+	cost  t_cell
+	board [16]t_cell
+	e     t_cell
 }
 
 // creates a new visit struct
-func nVisit(cost int8, board [16]int8, e int8) *visitSt {
+func nVisit(cost t_cell, board [16]t_cell, e t_cell) *visitSt {
 	return &visitSt{
 		cost,
 		board,
@@ -20,7 +20,7 @@ func nVisit(cost int8, board [16]int8, e int8) *visitSt {
 	}
 }
 
-func code(board [16]int8) int {
+func code(board [16]t_cell) int {
 	r := 0
 	b := bits.Len(uint(BOARD_ROW_SIZE))
 	for i := range board {
@@ -31,7 +31,7 @@ func code(board [16]int8) int {
 
 type WalkingDistance struct {
 	// walking distance table
-	table map[int]int8
+	table map[int]t_cell
 	// key is the value of the correct cell
 	// "map value int" is the index to the correct value cell
 	solved map[int]int
@@ -46,7 +46,7 @@ func NewWD(rowSize int) *WalkingDistance {
 		size:      rowSize,
 		bitLength: bits.Len(uint(rowSize)),
 	}
-	solvedArr := startingPoint(int16(wd.size))
+	solvedArr := startingPoint(t_cell(wd.size))
 	ls := make([]int, 16)
 	for i := 0; i < 15; i++ {
 		ls[i] = int(solvedArr[i])
@@ -63,10 +63,10 @@ func NewWD(rowSize int) *WalkingDistance {
 }
 
 func (wd *WalkingDistance) GenerateTable() *WalkingDistance {
-	wd.table = make(map[int]int8)
-	size := int8(wd.size)
+	wd.table = make(map[int]t_cell)
+	size := t_cell(wd.size)
 	// TODO Fix hard coded solved
-	solved := [16]int8{4, 0, 0, 0, 0, 4, 0, 0, 0, 0, 4, 0, 0, 0, 0, 3}
+	solved := [16]t_cell{4, 0, 0, 0, 0, 4, 0, 0, 0, 0, 4, 0, 0, 0, 0, 3}
 	visitable := make(chan *visitSt, 92850)
 	visitable <- nVisit(0, solved, size-1)
 	count := 0
@@ -76,12 +76,12 @@ func (wd *WalkingDistance) GenerateTable() *WalkingDistance {
 			continue
 		}
 		wd.table[key] = visit.cost
-		for _, d := range []int8{-1, 1} {
+		for _, d := range []t_cell{-1, 1} {
 			if 0 <= (visit.e+d) && (visit.e+d) < size {
-				var i int8
+				var i t_cell
 				for i < size {
 					if visit.board[size*(visit.e+d)+i] > 0 {
-						var newBoard [16]int8
+						var newBoard [16]t_cell
 						copy(newBoard[:], visit.board[:])
 						newBoard[size*(visit.e+d)+i] -= 1
 						newBoard[size*visit.e+i] += 1
@@ -100,7 +100,7 @@ func (wd *WalkingDistance) GenerateTable() *WalkingDistance {
 }
 
 // calculate the walking distance from the given board
-func (wd *WalkingDistance) Calculate(board []t_cell) int {
+func (wd *WalkingDistance) Calculate(board [16]t_cell) int {
 	heurestic := 0
 	rowCode := 0
 	colCode := 0
@@ -150,7 +150,7 @@ func (wd *WalkingDistance) Calculate(board []t_cell) int {
 }
 
 // util functions for debugging mostly
-func sum(l []int8) int {
+func sum(l []t_cell) int {
 	sum := 0
 	for _, v := range l {
 		sum += int(v)
@@ -158,12 +158,12 @@ func sum(l []int8) int {
 	return sum
 }
 
-func avg(l []int8) int {
+func avg(l []t_cell) int {
 	return sum(l) / len(l)
 }
 
-func max(l []int8) int8 {
-	var max int8
+func max(l []t_cell) t_cell {
+	var max t_cell
 	for _, v := range l {
 		if v > max {
 			max = v
