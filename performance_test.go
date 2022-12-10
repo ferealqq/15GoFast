@@ -103,8 +103,9 @@ func TestPerformanceFast(t *testing.T) {
 
 func TestPerformanceOne(t *testing.T) {
 	flag.Parse()
-	maxRuntimeMS := time.Duration(10600)
-	board := [16]t_cell{3, 6, 8, 7, 5, 0, 9, 2, 1, 4, 14, 15, 13, 10, 12, 11}
+	maxRuntimeMS := time.Duration(3000)
+	// board := [16]t_cell{3, 6, 8, 7, 5, 0, 9, 2, 1, 4, 14, 15, 13, 10, 12, 11}
+	board := [16]t_cell{2, 5, 8, 9, 4, 1, 14, 7, 6, 10, 3, 15, 13, 0, 11, 12}
 	n := time.Now()
 	if *cpuprofile != "" {
 		f, err := os.Create(*cpuprofile)
@@ -123,10 +124,18 @@ func TestPerformanceOne(t *testing.T) {
 		complexity: 0,
 	})
 	node, _ := srh.IDAStar(maxRuntimeMS)
-	dur := time.Since(n)
-	fmt.Printf("since n %s \n", dur)
-	assert.True(t, node.state.isSuccess())
 	if *cpuprofile != "" {
 		pprof.StopCPUProfile()
 	}
+	dur := time.Since(n)
+	fmt.Printf("since n %s \n", dur)
+	fmt.Printf("complexity %d \n", node.state.complexity)
+	// comps := []int{}
+	// for _,v := range node.hasSeen {
+	// 	comps = append(comps, int(v.complexity))
+	// }
+	// sort.Ints(comps)
+	// fmt.Println(comps)
+	// fmt.Println(node.state.complexity);
+	assert.True(t, node.state.isSuccess())
 }
