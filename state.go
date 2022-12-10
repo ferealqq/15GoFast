@@ -10,6 +10,7 @@ import (
 
 // Describes how many rows the board has
 const BOARD_ROW_SIZE = t_cell(4)
+const BOARD_LENGTH = BOARD_ROW_SIZE*BOARD_ROW_SIZE
 
 type t_int = int16
 type t_cell = int8
@@ -122,7 +123,7 @@ func startingPoint(size t_cell) [16]t_cell {
 
 // Get the first index of a element in a given array, returns -1 if not found
 func getElementIndex(arr [16]t_cell, element t_cell) t_cell {
-	for i := 0; i < len(arr); i++ {
+	for i := 0; i < int(BOARD_LENGTH); i++ {
 		if arr[i] == element {
 			return t_cell(i)
 		}

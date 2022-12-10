@@ -5,6 +5,8 @@ import (
 	"math/bits"
 )
 
+var bitsLen = bits.Len(uint(BOARD_ROW_SIZE))
+
 type visitSt struct {
 	cost  t_cell
 	board [16]t_cell
@@ -22,9 +24,8 @@ func nVisit(cost t_cell, board [16]t_cell, e t_cell) *visitSt {
 
 func code(board [16]t_cell) int {
 	r := 0
-	b := bits.Len(uint(BOARD_ROW_SIZE))
 	for i := range board {
-		r |= int(board[i]) << (b * i)
+		r |= int(board[i]) << (bitsLen * i)
 	}
 	return r
 }
@@ -44,7 +45,7 @@ type WalkingDistance struct {
 func NewWD(rowSize int) *WalkingDistance {
 	wd := &WalkingDistance{
 		size:      rowSize,
-		bitLength: bits.Len(uint(rowSize)),
+		bitLength: bitsLen,
 	}
 	solvedArr := startingPoint(t_cell(wd.size))
 	ls := make([]int, 16)
