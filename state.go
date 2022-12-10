@@ -1,7 +1,6 @@
 package main
 
 import (
-	b64 "encoding/base64"
 	"errors"
 	"fmt"
 	"math/rand"
@@ -200,15 +199,6 @@ func (state *State) newSwap(move *Move) *State {
 	newState.board[move.toIndex] = state.board[move.emptyIndex]
 	newState.board[move.emptyIndex] = val
 	return newState
-}
-
-// create a unique value for the board represented as string
-func hash(board []t_int) string {
-	var bs = make([]byte, len(board))
-	for i := 0; i < len(board); i++ {
-		bs[i] = byte(board[i])
-	}
-	return b64.StdEncoding.EncodeToString(bs)
 }
 
 // depricated should rather use code(board) === code(startingPoint(4))
