@@ -2,10 +2,17 @@
 
 ## Suorituskyvyn analysointi 
 
-`hash` funktio vei 0-30ms suorittaa ja 30ms pelkästään lookup käyttöön on erittäin paljon. Tämän korjaaminen on tärkeää.
+Mennellää viikolla käytin suurimman osan ajasta algoritmin prosessointi kyvyn parantamiseen.
 
-Tähän kuva molemmista, ja näytä siitä kuvasta, että tällä testikoodilla saatiin noin 1.5s säästö. data setti on kyllä vaan 1 mut silti.
+Minulla oli selvästi mielessä mitä ohjelmassa oli optimoitavaa jotta se toimisi vielä tehokkaammin.
 
+Kaksi optimisoinnin näkökulmaa jota lähdin tutkimaan:
+- Helpompien taulujen ratkaisu tehokkuuden optimointi.
+- Kompleksimpien taulujen ratkaisuiden tehokkuudn optimointi, jotta algoritmi pystyisi ratkaisemaan myös erittäin moni mutkaiset taulut.
+
+Suoritus kyky testaukseen löysin sopivaksi työkaluksi [pprof](https://pkg.go.dev/runtime/pprof#pkg-overview). Työlalun avulla kirjoitin kaksi testi skenaariota yllä mainittujen näkökulmien tutkimiseen.
+
+Monimutkaisten taulujen ratkaisu kyvyn optimointiin:
 ```golang
 var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
 
@@ -36,30 +43,10 @@ func TestPerformanceOne(t *testing.T) {
 	assert.True(t, node.state.isSuccess())
 }
 ```
-
-With hash commit   					=> acc9e682af0079d3de72921a6bda3f409d119b31
-without hash commit 				=> 1772cfb422683a1f2263822c9ba8c7d29cf43996
-GetValidStates improvements => 901882fa6c9c25075b50451932021cc17931e5c3
-code improvements 					=> b2819343a6871c6be710120c3798572fffae6a8c
-memoization 								=> 75e6634be9a880dcae586de56fa01da906736814
-without SearchState.staes   => 6cb4194badddf5f93fc281904c9b8b48cdad55b4
-without Move								=> 888be03c76dd06c3f02efac6aa9decdd505f6038
-
-Vertaile without hash commitin graaffia GetValidStates improvementtiin
-
-memoa => without SearchState.states
-
-Static GetValidStates return ja getElementIndex ei käytä generikkejä. noin (-1s) parannus.
+`board` muuttujan ratkaisemiseen tarvitaan 48 siirtoa. Ratkaisun löytämiseen huonosti optimoidulla IDASearch algoritmillä menee noin 10 sekunttia. 
 
 
-Memoization teki algoritmista hitaamman helpommpilla algoritmeillä mutta nopeamman vaikeamilla algoritmeilla.
-
-
-
-Vertaa miten, viikko 5 suoriutui tietyistä benchmarkeista ja miten viikko 6 lopussa ohjelma suoriutui benchmarkeista. 
-
-
-
+Helpompien taulujen ratkaisu kyvyn optimointiin testi:
 ```golang
 func TestPerformanceAverage(t *testing.T) {
 	flag.Parse()
@@ -104,3 +91,38 @@ func TestPerformanceAverage(t *testing.T) {
 	}
 }
 ```
+
+Testaus suoritettiin siten, että testien ja `golang` kielen käyttämät `cachet` olivat puhtaita. Tämä saavutettiin komennolla `go clean --cache ; go clean -testcache`. 
+
+Loppu tuloksia analysoin `pprof` työkalun luomalla `svg` diagrammilla. Testien diagrammit ovat tallennettuina repository:n [kansioon documentation/graphs](https://github.com/ferealqq/15GoFast/blob/main/documentation/graphs). 
+
+### `hash` funktion deprikointi
+
+[Commit](https://github.com/ferealqq/15GoFast/commit/acc9e682af0079d3de72921a6bda3f409d119b31)
+
+
+
+
+With hash commit   					=> acc9e682af0079d3de72921a6bda3f409d119b31\
+without hash commit 				=> 1772cfb422683a1f2263822c9ba8c7d29cf43996\
+GetValidStates improvements => 901882fa6c9c25075b50451932021cc17931e5c3\
+code improvements 					=> b2819343a6871c6be710120c3798572fffae6a8c\
+memoization 								=> 75e6634be9a880dcae586de56fa01da906736814\
+without SearchState.staes   => 6cb4194badddf5f93fc281904c9b8b48cdad55b4\
+without Move								=> 888be03c76dd06c3f02efac6aa9decdd505f6038
+
+Vertaile without hash commitin graaffia GetValidStates improvementtiin
+
+memoa => without SearchState.states
+
+Static GetValidStates return ja getElementIndex ei käytä generikkejä. noin (-1s) parannus.
+
+
+Memoization teki algoritmista hitaamman helpommpilla algoritmeillä mutta nopeamman vaikeamilla algoritmeilla.
+
+
+
+Vertaa miten, viikko 5 suoriutui tietyistä benchmarkeista ja miten viikko 6 lopussa ohjelma suoriutui benchmarkeista. 
+
+
+
