@@ -7,11 +7,11 @@ import (
 
 // Contains all the important variables for the search
 type SearchState struct {
-	state               *State
-	hasSeen             map[int]*State
-	states              []*State
-	wd									*WalkingDistance
-	Heuristic						heurFn
+	state     *State
+	hasSeen   map[int]*State
+	states    []*State
+	wd        *WalkingDistance
+	Heuristic heurFn
 	// walkingDistance     func([16]t_cell) int
 }
 
@@ -21,14 +21,13 @@ type Node struct {
 	depth t_int
 }
 
-
 // create a new search struct from a state
 func NewSearch(state *State) *SearchState {
 	wd := NewWD(int(state.size))
 	srh := &SearchState{
-		state:           state,
+		state: state,
 		// wd:							 wd,
-		hasSeen:         make(map[int]*State),
+		hasSeen: make(map[int]*State),
 	}
 
 	srh.Heuristic = srh.memo(wd.Calculate)
@@ -50,7 +49,7 @@ func (search *SearchState) memo(fn heurFn) heurFn {
 		cache[key] = fn(input)
 		return val
 	}
-} 
+}
 
 // func (search *SearchState) Heuristic(state *State) int {
 // 	cache := make(map[interface{}]T)

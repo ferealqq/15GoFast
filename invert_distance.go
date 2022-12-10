@@ -109,7 +109,7 @@ func invertDistance(board [16]t_cell) t_cell {
 
 	// Calculate the vertical inversions
 	inv := 0
-	size := t_cell(BOARD_ROW_SIZE*BOARD_ROW_SIZE);
+	size := t_cell(BOARD_ROW_SIZE * BOARD_ROW_SIZE)
 	for i := t_cell(0); i < size; i++ {
 		if board[i] != 0 {
 			for j := t_cell(0); j < i; j++ {
@@ -163,7 +163,7 @@ func memoizeBoardCalculation[T interface{}, R interface{}](fn MemoizedFunction[T
 func calculateHorizontalBoard(rowSize t_cell) [16]t_cell {
 	board := startingPoint(rowSize)
 	// horizontalBoard := make([]t_cell, len(board))
-	var horizontalBoard [16]t_cell;
+	var horizontalBoard [16]t_cell
 	copy(horizontalBoard[:], board[:])
 	// make the board list be a horizontal representation of the puzzle board
 	for i := t_cell(0); i < rowSize; i++ {

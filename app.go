@@ -93,8 +93,8 @@ func (app *App) Solve() SolveResult {
 				Direction  t_direction
 			}{
 				EmptyIndex: state.move.emptyIndex,
-				ToIndex: state.move.toIndex,
-				Direction: state.move.direction,
+				ToIndex:    state.move.toIndex,
+				Direction:  state.move.direction,
 			}}
 			fmt.Println(boards[i])
 		}

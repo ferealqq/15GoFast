@@ -10,5 +10,5 @@ import (
 func TestGetValidPositions(t *testing.T) {
 	app := NewApp()
 
-	assert.NotNil(t,app)
+	assert.NotNil(t, app)
 }

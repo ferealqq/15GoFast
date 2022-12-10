@@ -10,7 +10,7 @@ import (
 
 // Describes how many rows the board has
 const BOARD_ROW_SIZE = t_cell(4)
-const BOARD_LENGTH = BOARD_ROW_SIZE*BOARD_ROW_SIZE
+const BOARD_LENGTH = BOARD_ROW_SIZE * BOARD_ROW_SIZE
 
 type t_int = int16
 type t_cell = int8
@@ -61,8 +61,8 @@ func (m *Move) Print() {
 
 // State of the 15 puzzle board
 type State struct {
-	size       t_cell
-	board      [16]t_cell
+	size  t_cell
+	board [16]t_cell
 	// TODO Depricated?
 	complexity t_int
 	move       *Move
@@ -89,7 +89,7 @@ func GenerateState(complexity t_int) (*State, error) {
 		visited = append(visited, code(state.board))
 		sts := state.GetValidStates()
 		filtered := []*State{}
-		for _,next := range sts {
+		for _, next := range sts {
 			if next == nil {
 				continue
 			}
@@ -188,7 +188,7 @@ func (state *State) newSwap(move *Move) *State {
 	// tää on bottleneck
 	// we have to create a copy of the board because otherwise they will be linked with a pointer
 	// boardCopy := make([]t_int, len(state.board))
-	var boardCopy [16]t_cell;
+	var boardCopy [16]t_cell
 	copy(boardCopy[:], state.board[:])
 	newState := &State{
 		board:      boardCopy,
@@ -212,7 +212,7 @@ func hash(board []t_int) string {
 }
 
 func (state *State) isSuccess() bool {
-	size := t_cell(BOARD_ROW_SIZE*BOARD_ROW_SIZE-1)
+	size := t_cell(BOARD_ROW_SIZE*BOARD_ROW_SIZE - 1)
 	for i := t_cell(0); i < size; i++ {
 		if state.board[i] != i+1 {
 			return false

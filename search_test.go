@@ -29,7 +29,7 @@ func TestHorizontal(t *testing.T) {
 	}
 
 	// trans := make([16]t_cell, len(board))
-	var trans [16]t_cell;
+	var trans [16]t_cell
 	copy(trans[:], board[:])
 	for i := 0; i < 4; i++ {
 		for j := 0; j < 4; j++ {
@@ -82,7 +82,7 @@ func TestSearchRandomEasyish(t *testing.T) {
 }
 
 func TestOptm(t *testing.T) {
-	// first version 1.1s 
+	// first version 1.1s
 	// second version 0.7s
 	// third version 0.03s
 	// fourth version 0.025s
