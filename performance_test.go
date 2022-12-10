@@ -112,12 +112,13 @@ func TestPerformanceAverage(t *testing.T) {
 		// defer pprof.StopCPUProfile()
 	} else {
 		// only run the test when we want to capture the memory usage
-		t.Skip()
+		// t.Skip()
 	}
 	maxRuntimeMS := time.Duration(10600)
 	boards := [][16]t_cell{
 		{3, 4, 6, 5, 1, 7, 2, 14, 13, 15, 11, 8, 10, 0, 9, 12},
 		{3, 6, 8, 7, 5, 0, 9, 2, 1, 4, 14, 15, 13, 10, 12, 11},
+		{0, 4, 11, 7, 6, 1, 5, 12, 2, 13, 15, 8, 9, 10, 14, 3},
 	}
 	perfList := make(map[int][]time.Duration)
 	for id, board := range boards {
