@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -64,7 +63,6 @@ func TestSearchRandomFastEasy(t *testing.T) {
 	state.board = board
 	srh := NewSearch(state)
 	node, _ := srh.IDAStar(maxRuntimeMS)
-	node.printMoves()
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
 }
@@ -76,7 +74,6 @@ func TestSearchRandomEasyish(t *testing.T) {
 	state.board = board
 	srh := NewSearch(state)
 	node, _ := srh.IDAStar(maxRuntimeMS)
-	node.printMoves()
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
 }
@@ -86,14 +83,11 @@ func TestOptm(t *testing.T) {
 	// second version 0.7s
 	// third version 0.03s
 	// fourth version 0.025s
-	// time to beat 0.7s, old was 1.1s
 	board := [16]t_cell{10, 9, 0, 4, 13, 11, 2, 8, 6, 3, 7, 12, 5, 1, 14, 15}
-	fmt.Println(board)
 	state := NewState()
 	state.board = board
 	srh := NewSearch(state)
 	node, _ := srh.IDAStar(maxRuntimeMS)
-	node.printMoves()
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
 }
@@ -105,7 +99,6 @@ func TestSearchRandomFastMedium(t *testing.T) {
 	state.board = board
 	srh := NewSearch(state)
 	node, _ := srh.IDAStar(maxRuntimeMS)
-	node.printMoves()
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
 }
@@ -117,7 +110,6 @@ func TestSearchRandomFastMediumish(t *testing.T) {
 	state.board = board
 	srh := NewSearch(state)
 	node, _ := srh.IDAStar(maxRuntimeMS)
-	node.printMoves()
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
 }
@@ -131,7 +123,6 @@ func TestSearchRandomFastHard(t *testing.T) {
 	node, _ := srh.IDAStar(maxRuntimeMS)
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
-	node.printMoves()
 }
 
 func TestSearchRandomFastHarder(t *testing.T) {
@@ -143,19 +134,16 @@ func TestSearchRandomFastHarder(t *testing.T) {
 	node, _ := srh.IDAStar(maxRuntimeMS)
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
-	node.printMoves()
 }
 
 // named slow so that grouping test runs are easier
 func TestSearchRandomSlowHard(t *testing.T) {
 	st, _ := GenerateState(150)
 	board := st.board
-	fmt.Println(board)
 	state := NewState()
 	state.board = board
 	srh := NewSearch(state)
 	node, _ := srh.IDAStar(maxRuntimeMS)
-	node.printMoves()
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
 }
@@ -164,12 +152,10 @@ func TestSearchRandomSlowHarder(t *testing.T) {
 	// Running this test can take multiple seconds in the worst case
 	st, _ := GenerateState(250)
 	board := st.board
-	fmt.Println(board)
 	state := NewState()
 	state.board = board
 	srh := NewSearch(state)
 	node, _ := srh.IDAStar(maxRuntimeMS)
-	node.printMoves()
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
 }
@@ -181,7 +167,6 @@ func TestSearchRandomSlowHardest(t *testing.T) {
 	state.board = board
 	srh := NewSearch(state)
 	node, _ := srh.IDAStar(time.Duration(50000))
-	node.printMoves()
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
 }
@@ -190,26 +175,21 @@ func TestSearchEasy(t *testing.T) {
 	board := [16]t_cell{1, 2, 0, 4, 5, 6, 3, 8, 9, 10, 7, 11, 13, 14, 15, 12}
 	state := NewState()
 	state.board = board
-	fmt.Println(state.board)
 	srh := NewSearch(state)
 	node, _ := srh.IDAStar(maxRuntimeMS)
-	fmt.Println(state.board)
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
 
-	node.printMoves()
 }
 
 func TestSearchStuck(t *testing.T) {
 	board := [16]t_cell{5, 9, 11, 2, 1, 6, 15, 0, 13, 10, 4, 7, 14, 12, 8, 3}
-	fmt.Println(board)
 	state := NewState()
 	state.board = board
 	srh := NewSearch(state)
 	node, _ := srh.IDAStar(maxRuntimeMS)
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
-	node.printMoves()
 }
 
 func TestSearchBugs(t *testing.T) {
@@ -220,13 +200,11 @@ func TestSearchBugs(t *testing.T) {
 	node, _ := srh.IDAStar(maxRuntimeMS)
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
-	node.printMoves()
 	board = [16]t_cell{5, 1, 2, 3, 9, 6, 8, 4, 13, 10, 7, 12, 14, 11, 15, 0}
 	state = NewState()
 	state.board = board
 	srh = NewSearch(state)
 	node, _ = srh.IDAStar(maxRuntimeMS)
-	node.printMoves()
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
 

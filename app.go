@@ -87,16 +87,16 @@ func (app *App) Solve() SolveResult {
 	if status == SUCCESS {
 		boards := make([]IterationData, len(res.hasSeen))
 		// TODO range hasSeen sort by complexity
-		for i, state := range res.hasSeen {
-			boards[i] = IterationData{Board: state.board, Move: struct {
-				EmptyIndex t_cell
-				ToIndex    t_cell
-				Direction  t_direction
-			}{
-				EmptyIndex: state.move.emptyIndex,
-				ToIndex:    state.move.toIndex,
-				Direction:  state.move.direction,
-			}}
+		for i, _ := range res.hasSeen {
+			// boards[i] = IterationData{Board: state.board, Move: struct {
+			// 	EmptyIndex t_cell
+			// 	ToIndex    t_cell
+			// 	Direction  t_direction
+			// }{
+			// 	EmptyIndex: state.move.emptyIndex,
+			// 	ToIndex:    state.move.toIndex,
+			// 	Direction:  state.move.direction,
+			// }}
 			fmt.Println(boards[i])
 		}
 		ms := elapsed / time.Millisecond

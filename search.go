@@ -60,6 +60,8 @@ func (search *SearchState) IDAStar(maxRuntimeMS time.Duration) (*SearchState, ST
 	// https://en.wikipedia.org/wiki/Iterative_deepening_A*
 	cutoff := t_int(search.Heuristic(search.state.board))
 	quitTick := time.NewTicker(maxRuntimeMS * time.Millisecond)
+	// miten tähän pitäis reagoida? chekkaatko onko se tässä tilassa ja heitä feilu vai mitä? ja mites muuten generate state voi mennä tohon tilaan? Ton ei pitäis olla matemaattisesti mahdollista mennä tohon tilaan.
+	// [16]int8{1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 10, 12, 13, 15, 14, 0}
 	defer quitTick.Stop()
 	for {
 		select {
@@ -104,7 +106,7 @@ func (search *SearchState) IDASearch(cutoff t_int, cost t_int) (STATUS, t_int) {
 			continue
 		}
 		key := code(next.board)
-		// checks if the board is in the starting position. successCode === startingPosition code  
+		// checks if the board is in the starting position. successCode === startingPosition code
 		if key == search.successCode {
 			search.state = next
 			return SUCCESS, 0
@@ -139,9 +141,11 @@ func (search *SearchState) IDASearch(cutoff t_int, cost t_int) (STATUS, t_int) {
 
 func (search *SearchState) printMoves() {
 	for _, s := range search.hasSeen {
-		if s.move != nil {
-			fmt.Printf(" %s ", s.move.directionString())
-		}
+		// fmt.Println(s.board)
+		fmt.Printf("%d ", s.complexity)
+		// if s.move != nil {
+		// 	fmt.Printf(" %s ", s.move.directionString())
+		// }
 	}
 	fmt.Printf("\n")
 }

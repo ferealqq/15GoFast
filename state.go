@@ -24,7 +24,7 @@ const (
 	DIRECTION_RIGHT = t_direction(3)
 )
 
-// Describes what kind of a move has been executed
+// DEPRICATED Describes what kind of a move has been executed
 type Move struct {
 	emptyIndex t_cell
 	toIndex    t_cell
@@ -60,11 +60,9 @@ func (m *Move) Print() {
 
 // State of the 15 puzzle board
 type State struct {
-	size  t_cell
-	board [16]t_cell
-	// TODO Depricated?
+	size       t_cell
+	board      [16]t_cell
 	complexity t_int
-	move       *Move
 }
 
 // returns pointer to a new state with clean board.
@@ -148,56 +146,52 @@ func (state *State) GetValidStates() [4]*State {
 
 	// not on the first line
 	if emptyIndex-state.size >= 0 {
-		states[0] = state.newSwap(&Move{
+		states[0] = state.newSwap(
 			emptyIndex,
-			emptyIndex - state.size,
-			DIRECTION_UP,
-		})
+			emptyIndex-state.size,
+		)
+
 	}
 	// Not on last line
 	if emptyIndex+state.size < t_cell(len(state.board)) {
-		states[1] = state.newSwap(&Move{
+		states[1] = state.newSwap(
 			emptyIndex,
-			emptyIndex + state.size,
-			DIRECTION_DOWN,
-		})
+			emptyIndex+state.size,
+		)
 	}
 	// Not on right edge
 	if emptyIndex%state.size != state.size-1 {
-		states[2] = state.newSwap(&Move{
+		states[2] = state.newSwap(
 			emptyIndex,
-			emptyIndex + 1,
-			DIRECTION_RIGHT,
-		})
+			emptyIndex+1,
+		)
+
 	}
 	// Not on left edge
 	if emptyIndex%state.size != 0 {
-		states[3] = state.newSwap(&Move{
+		states[3] = state.newSwap(
 			emptyIndex,
-			emptyIndex - 1,
-			DIRECTION_LEFT,
-		})
+			emptyIndex-1,
+		)
+
 	}
 
 	return states
 }
 
 // swaps the two elements in the given indexes for a new state
-func (state *State) newSwap(move *Move) *State {
-	// tää on bottleneck
+func (state *State) newSwap(emptyIndex t_cell, toIndex t_cell) *State {
 	// we have to create a copy of the board because otherwise they will be linked with a pointer
-	// boardCopy := make([]t_int, len(state.board))
 	var boardCopy [16]t_cell
 	copy(boardCopy[:], state.board[:])
 	newState := &State{
 		board:      boardCopy,
 		size:       state.size,
 		complexity: state.complexity + 1,
-		move:       move,
 	}
-	val := state.board[move.toIndex]
-	newState.board[move.toIndex] = state.board[move.emptyIndex]
-	newState.board[move.emptyIndex] = val
+	val := state.board[toIndex]
+	newState.board[toIndex] = state.board[emptyIndex]
+	newState.board[emptyIndex] = val
 	return newState
 }
 
