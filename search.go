@@ -10,7 +10,9 @@ type SearchState struct {
 	state               *State
 	hasSeen             map[int]*State
 	states              []*State
-	walkingDistance     func([16]t_cell) int
+	wd									*WalkingDistance
+	Heuristic						heurFn
+	// walkingDistance     func([16]t_cell) int
 }
 
 // node struct of search state, this helps the idastar algorithm to keep track of the depth the algorithm has gone through
@@ -19,17 +21,49 @@ type Node struct {
 	depth t_int
 }
 
+
 // create a new search struct from a state
 func NewSearch(state *State) *SearchState {
 	wd := NewWD(int(state.size))
 	srh := &SearchState{
 		state:           state,
-		walkingDistance: wd.Calculate,
+		// wd:							 wd,
 		hasSeen:         make(map[int]*State),
 	}
 
+	srh.Heuristic = srh.memo(wd.Calculate)
+
 	return srh
 }
+
+type heurFn = func([16]t_cell) int
+
+func (search *SearchState) memo(fn heurFn) heurFn {
+	cache := make(map[int]int)
+
+	return func(input [16]t_cell) int {
+		key := code(input)
+		if val, found := cache[key]; found {
+			return val
+		}
+		val := fn(input)
+		cache[key] = fn(input)
+		return val
+	}
+} 
+
+// func (search *SearchState) Heuristic(state *State) int {
+// 	cache := make(map[interface{}]T)
+
+// 	return func(input R) T {
+// 		if val, found := cache[input]; found {
+// 			return val
+// 		}
+// 		val := fn(input)
+// 		cache[input] = fn(input)
+// 		return val
+// 	}
+// }
 
 type result struct {
 	status STATUS
@@ -40,7 +74,7 @@ type result struct {
 func (search *SearchState) IDAStar(maxRuntimeMS time.Duration) (*SearchState, STATUS) {
 	// TODO Figure out what we want to return when the calculations are a success
 	// https://en.wikipedia.org/wiki/Iterative_deepening_A*
-	cutoff := t_int(search.walkingDistance(search.state.board))
+	cutoff := t_int(search.Heuristic(search.state.board))
 	search.states = []*State{search.state}
 
 	quitTick := time.NewTicker(maxRuntimeMS * time.Millisecond)
@@ -76,7 +110,8 @@ const TIME_EXCEEDED = STATUS(3)
 // IDASearch, returns STATUS, cutoff, cost
 func (search *SearchState) IDASearch(cutoff t_int, cost t_int) (STATUS, t_int) {
 	state := search.states[len(search.states)-1]
-	h := search.walkingDistance(state.board)
+	// kato onko tota state käyty jo läpi, jos on niin ota se ja kato sen heuristiikka.
+	h := search.Heuristic(state.board)
 	f := t_int(h) + cost
 	if f > cutoff {
 		return CUTOFF, f
