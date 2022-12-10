@@ -211,7 +211,8 @@ func hash(board []t_int) string {
 	return b64.StdEncoding.EncodeToString(bs)
 }
 
-func (state *State) isSuccess() bool {
+// depricated should rather use code(board) === code(startingPoint(4))
+func (state *State) debugIsSuccess() bool {
 	size := t_cell(BOARD_ROW_SIZE*BOARD_ROW_SIZE - 1)
 	for i := t_cell(0); i < size; i++ {
 		if state.board[i] != i+1 {

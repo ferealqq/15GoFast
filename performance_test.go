@@ -47,12 +47,12 @@ func TestPerformance(t *testing.T) {
 			node, _ := srh.IDAStar(maxRuntimeMS)
 			dur := time.Since(n)
 			perfList[id] = append(perfList[id], dur)
-			assert.True(t, node.state.isSuccess())
+			assert.True(t, node.state.debugIsSuccess())
 		}
 	}
 }
 
-func TestPerformanceFast(t *testing.T) {
+func TestPerformanceAverage(t *testing.T) {
 	flag.Parse()
 	if *cpuprofile != "" {
 		f, err := os.Create(*cpuprofile)
@@ -63,7 +63,7 @@ func TestPerformanceFast(t *testing.T) {
 		// defer pprof.StopCPUProfile()
 	} else {
 		// only run the test when we want to capture the memory usage
-		t.Skip()
+		// t.Skip()
 	}
 	maxRuntimeMS := time.Duration(10600)
 	boards := [][16]t_cell{
@@ -72,7 +72,6 @@ func TestPerformanceFast(t *testing.T) {
 	}
 	perfList := make(map[int][]time.Duration)
 	for id, board := range boards {
-		// id := code(board)
 		for i := 0; i < 60; i++ {
 			n := time.Now()
 			srh := NewSearch(&State{
@@ -82,9 +81,8 @@ func TestPerformanceFast(t *testing.T) {
 			})
 			node, _ := srh.IDAStar(maxRuntimeMS)
 			dur := time.Since(n)
-			fmt.Printf("since n %s \n", dur)
 			perfList[id] = append(perfList[id], dur)
-			assert.True(t, node.state.isSuccess())
+			assert.True(t, node.state.debugIsSuccess())
 		}
 	}
 	if *cpuprofile != "" {
@@ -104,7 +102,6 @@ func TestPerformanceFast(t *testing.T) {
 func TestPerformanceOne(t *testing.T) {
 	flag.Parse()
 	maxRuntimeMS := time.Duration(3000)
-	// board := [16]t_cell{3, 6, 8, 7, 5, 0, 9, 2, 1, 4, 14, 15, 13, 10, 12, 11}
 	board := [16]t_cell{2, 5, 8, 9, 4, 1, 14, 7, 6, 10, 3, 15, 13, 0, 11, 12}
 	n := time.Now()
 	if *cpuprofile != "" {
@@ -128,14 +125,10 @@ func TestPerformanceOne(t *testing.T) {
 		pprof.StopCPUProfile()
 	}
 	dur := time.Since(n)
+	fmt.Printf("starting point code %d \n", code(startingPoint(4)))
 	fmt.Printf("since n %s \n", dur)
 	fmt.Printf("complexity %d \n", node.state.complexity)
-	// comps := []int{}
-	// for _,v := range node.hasSeen {
-	// 	comps = append(comps, int(v.complexity))
-	// }
-	// sort.Ints(comps)
-	// fmt.Println(comps)
-	// fmt.Println(node.state.complexity);
-	assert.True(t, node.state.isSuccess())
+	fmt.Printf("node board \n");
+	fmt.Println(node.state.board)
+	assert.True(t, node.state.debugIsSuccess())
 }

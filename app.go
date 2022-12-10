@@ -86,7 +86,7 @@ func (app *App) Solve() SolveResult {
 	elapsed := time.Since(now)
 	if status == SUCCESS {
 		boards := make([]IterationData, len(res.hasSeen))
-		// TODO range hasSeen sort by complexity 
+		// TODO range hasSeen sort by complexity
 		for i, state := range res.hasSeen {
 			boards[i] = IterationData{Board: state.board, Move: struct {
 				EmptyIndex t_cell

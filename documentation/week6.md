@@ -20,10 +20,6 @@ func TestPerformanceOne(t *testing.T) {
 			log.Fatal(err)
 		}
 		pprof.StartCPUProfile(f)
-		// defer pprof.StopCPUProfile()
-	} else {
-		// only run the test when we want to capture the memory usage
-		// t.Skip()
 	}
 	srh := NewSearch(&State{
 		size:       BOARD_ROW_SIZE,
@@ -41,8 +37,15 @@ func TestPerformanceOne(t *testing.T) {
 }
 ```
 
-With hash commit => acc9e682af0079d3de72921a6bda3f409d119b31
-without hash commit => 1772cfb422683a1f2263822c9ba8c7d29cf43996
+With hash commit   					=> acc9e682af0079d3de72921a6bda3f409d119b31
+without hash commit 				=> 1772cfb422683a1f2263822c9ba8c7d29cf43996
+GetValidStates improvements => 901882fa6c9c25075b50451932021cc17931e5c3
+code improvements 					=> b2819343a6871c6be710120c3798572fffae6a8c
+memoization 								=> 75e6634be9a880dcae586de56fa01da906736814
+
+Vertaile without hash commitin graaffia GetValidStates improvementtiin
+
+memoa => without SearchState.states
 
 Static GetValidStates return ja getElementIndex ei käytä generikkejä. noin (-1s) parannus.
 

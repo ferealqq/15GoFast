@@ -7,9 +7,10 @@ import (
 
 // Contains all the important variables for the search
 type SearchState struct {
-	state     *State
-	hasSeen   map[int]*State
-	Heuristic heurFn
+	state       *State
+	hasSeen     map[int]*State
+	Heuristic   heurFn
+	successCode int
 }
 
 // node struct of search state, this helps the idastar algorithm to keep track of the depth the algorithm has gone through
@@ -22,8 +23,9 @@ type Node struct {
 func NewSearch(state *State) *SearchState {
 	wd := NewWD(int(state.size))
 	srh := &SearchState{
-		state: state,
-		hasSeen: make(map[int]*State),
+		state:       state,
+		hasSeen:     make(map[int]*State),
+		successCode: code(startingPoint(state.size)),
 	}
 
 	srh.Heuristic = srh.memo(wd.Calculate)
@@ -55,13 +57,9 @@ type result struct {
 
 // Iterative Deepening A* search algorithm
 func (search *SearchState) IDAStar(maxRuntimeMS time.Duration) (*SearchState, STATUS) {
-	// TODO Figure out what we want to return when the calculations are a success
 	// https://en.wikipedia.org/wiki/Iterative_deepening_A*
 	cutoff := t_int(search.Heuristic(search.state.board))
-	// search.states = []*State{search.state}
-	// fmt.Printf("search state 0 pointer %p search state pointer %p \n",search.states[0],search.state)
 	quitTick := time.NewTicker(maxRuntimeMS * time.Millisecond)
-	fmt.Println("solving")
 	defer quitTick.Stop()
 	for {
 		select {
@@ -69,12 +67,10 @@ func (search *SearchState) IDAStar(maxRuntimeMS time.Duration) (*SearchState, ST
 			fmt.Println("time limit exceeded")
 			return search, TIME_EXCEEDED
 		default:
-			// fmt.Println("start")
 			status, cut := search.IDASearch(cutoff, t_int(0))
 			if status == SUCCESS {
 				return search, SUCCESS
 			} else if status == CUTOFF {
-				// fmt.Println("cutoff")
 				cutoff = cut
 			} else if status == FAILURE {
 				return search, FAILURE
@@ -108,6 +104,11 @@ func (search *SearchState) IDASearch(cutoff t_int, cost t_int) (STATUS, t_int) {
 			continue
 		}
 		key := code(next.board)
+		// checks if the board is in the starting position. successCode === startingPosition code  
+		if key == search.successCode {
+			search.state = next
+			return SUCCESS, 0
+		}
 		if _, ok := search.hasSeen[key]; ok {
 			continue
 		}
@@ -127,10 +128,6 @@ func (search *SearchState) IDASearch(cutoff t_int, cost t_int) (STATUS, t_int) {
 		// remove last item from the seen list
 		delete(search.hasSeen, key)
 		search.state = &old
-	}
-
-	if search.state.isSuccess() {
-		return SUCCESS, 0
 	}
 
 	if stop {
