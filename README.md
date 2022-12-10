@@ -4,16 +4,14 @@
 
 15Puzzle game solver
 
-## Documentation
-If you want to see the documentation of the application you'll have to have docker installed on your computer. 
+## Reports
 
-
-To start the documentation server use script `run_documentation.sh`
-Example: 
-```terminal
-chmod +x run_documentation.sh
-./run_documentation.sh
-```
+[week 1](https://github.com/ferealqq/15GoFast/blob/main/documentation/week1.md)
+[week 2](https://github.com/ferealqq/15GoFast/blob/main/documentation/week2.md)
+[week 3](https://github.com/ferealqq/15GoFast/blob/main/documentation/week4.md)
+[week 4](https://github.com/ferealqq/15GoFast/blob/main/documentation/week4.md)
+[week 5](https://github.com/ferealqq/15GoFast/blob/main/documentation/week5.md)
+[week 6](https://github.com/ferealqq/15GoFast/blob/main/documentation/week6.md)
 
 After you have successfully started the documentation server you can find the documentation via this [path](http://localhost:6060/pkg/github.com/ferealqq/15GoFast/)
 
@@ -32,10 +30,13 @@ To build a redistributable, production mode package, use `wails build`.
 
 ## Testing
 
-To test the core logic of the application run
+To test the core logic of the application run: 
 ```terminal
+# takes 5s to 25s depending on how hard the random generated puzzles are.
 go test . 
 ```
+
+Some times the tests may exceed the time limit of solving the puzzle board. But exceeding the time limit should be very rare.
 
 ## Profiling 
 
@@ -55,17 +56,19 @@ go tool pprof search.prof
 (pprof) web
 ```
 
-## Reports
-
-[week 1](https://github.com/ferealqq/15GoFast/blob/main/documentation/week1.md)
-[week 2](https://github.com/ferealqq/15GoFast/blob/main/documentation/week2.md)
-[week 3](https://github.com/ferealqq/15GoFast/blob/main/documentation/week4.md)
-[week 4](https://github.com/ferealqq/15GoFast/blob/main/documentation/week4.md)
-[week 5](https://github.com/ferealqq/15GoFast/blob/main/documentation/week5.md)
-
 
 ## Documentation
 
 ### Profiles 
 
 Profile files are [here](https://github.com/ferealqq/15GoFast/blob/main/profiles)
+
+## GO pkg documentation
+If you want to see the documentation of the application you'll have to have docker installed on your computer. 
+
+To start the documentation server use script `run_documentation.sh`
+Example: 
+```terminal
+chmod +x run_documentation.sh
+./run_documentation.sh
+```

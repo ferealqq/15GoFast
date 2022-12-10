@@ -1,6 +1,6 @@
 # Viikko 6 
 
-## Suorituskyvyn analysointi ja testaus
+## Suorituskyvyn analysointi 
 
 `hash` funktio vei 0-30ms suorittaa ja 30ms pelkästään lookup käyttöön on erittäin paljon. Tämän korjaaminen on tärkeää.
 
