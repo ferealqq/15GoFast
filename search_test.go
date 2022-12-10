@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const maxRuntimeMS = time.Duration(1500)
+const maxRuntimeMS = time.Duration(10000)
 
 func TestInversionDistance(t *testing.T) {
 	board := startingPoint(4)
@@ -135,7 +135,7 @@ func TestSearchRandomFastHard(t *testing.T) {
 }
 
 func TestSearchRandomFastHarder(t *testing.T) {
-	st, _ := GenerateState(80)
+	st, _ := GenerateState(100)
 	board := st.board
 	state := NewState()
 	state.board = board
@@ -148,14 +148,13 @@ func TestSearchRandomFastHarder(t *testing.T) {
 
 // named slow so that grouping test runs are easier
 func TestSearchRandomSlowHard(t *testing.T) {
-	t.Skip()
 	st, _ := GenerateState(150)
 	board := st.board
 	fmt.Println(board)
 	state := NewState()
 	state.board = board
 	srh := NewSearch(state)
-	node, _ := srh.IDAStar(70)
+	node, _ := srh.IDAStar(maxRuntimeMS)
 	node.printMoves()
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
@@ -163,28 +162,25 @@ func TestSearchRandomSlowHard(t *testing.T) {
 
 func TestSearchRandomSlowHarder(t *testing.T) {
 	// Running this test can take multiple seconds in the worst case
-	st, _ := GenerateState(150)
+	st, _ := GenerateState(250)
 	board := st.board
 	fmt.Println(board)
 	state := NewState()
 	state.board = board
 	srh := NewSearch(state)
-	// fails if runs over five seconds
-	node, _ := srh.IDAStar(time.Duration(5000))
+	node, _ := srh.IDAStar(maxRuntimeMS)
 	node.printMoves()
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
 }
 
-func TestSearchRandomSlowVeryHard(t *testing.T) {
-	// t.Skip()
-	st, _ := GenerateState(300)
+func TestSearchRandomSlowHardest(t *testing.T) {
+	st, _ := GenerateState(350)
 	board := st.board
 	state := NewState()
 	state.board = board
-	fmt.Println(board)
 	srh := NewSearch(state)
-	node, _ := srh.IDAStar(time.Duration(15000))
+	node, _ := srh.IDAStar(time.Duration(50000))
 	node.printMoves()
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))

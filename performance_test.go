@@ -25,7 +25,7 @@ func TestPerformance(t *testing.T) {
 			defer pprof.StopCPUProfile()
 	}else{
 		// only run the test when we want to capture the memory usage
-		// t.Skip()
+		t.Skip()
 	}
 	maxRuntimeMS := time.Duration(10600)
 	boards := [][16]t_cell{
@@ -47,7 +47,6 @@ func TestPerformance(t *testing.T) {
 			})
 			node, _ := srh.IDAStar(maxRuntimeMS)
 			dur := time.Since(n)
-			fmt.Printf("since n %s \n",dur)
 			perfList[id] = append(perfList[id],dur)
 			assert.True(t,node.state.isSuccess());
 		}
@@ -62,10 +61,9 @@ func TestPerformanceFast(t *testing.T) {
 					log.Fatal(err)
 			}
 			pprof.StartCPUProfile(f)
-			// defer pprof.StopCPUProfile()
 	}else{
 		// only run the test when we want to capture the memory usage
-		// t.Skip()
+		t.Skip()
 	}
 	maxRuntimeMS := time.Duration(10600)
 	boards := [][16]t_cell{
@@ -86,7 +84,6 @@ func TestPerformanceFast(t *testing.T) {
 			})
 			node, _ := srh.IDAStar(maxRuntimeMS)
 			dur := time.Since(n)
-			fmt.Printf("since n %s \n",dur)
 			perfList[id] = append(perfList[id],dur)
 			assert.True(t,node.state.isSuccess());
 		}
