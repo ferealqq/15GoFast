@@ -185,6 +185,7 @@ func (state *State) GetValidStates() [4]*State {
 
 // swaps the two elements in the given indexes for a new state
 func (state *State) newSwap(move *Move) *State {
+	// tää on bottleneck
 	// we have to create a copy of the board because otherwise they will be linked with a pointer
 	// boardCopy := make([]t_int, len(state.board))
 	var boardCopy [16]t_cell;

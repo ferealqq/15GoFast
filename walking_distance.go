@@ -48,17 +48,11 @@ func NewWD(rowSize int) *WalkingDistance {
 		bitLength: bitsLen,
 	}
 	solvedArr := startingPoint(t_cell(wd.size))
-	ls := make([]int, 16)
-	for i := 0; i < 15; i++ {
-		ls[i] = int(solvedArr[i])
-	}
-
 	// map representation of solved values to used for faster lookup time
 	wd.solved = make(map[int]int)
-	for i, val := range ls {
-		wd.solved[val] = i
+	for i := 0; i < 16; i++ {
+		wd.solved[int(solvedArr[i])] = i
 	}
-
 	wd.GenerateTable()
 	return wd
 }

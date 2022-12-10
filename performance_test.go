@@ -77,8 +77,7 @@ func TestPerformanceFast(t *testing.T) {
 	}
 	perfList := make(map[int][]time.Duration)
 	for id,board := range boards {
-		// id := code(board)
-		for i := 0; i < 3; i++ {
+		for i := 0; i < 60; i++ {
 			n := time.Now()
 			srh := NewSearch(&State{
 				size:       BOARD_ROW_SIZE,
