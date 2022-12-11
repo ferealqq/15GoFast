@@ -130,33 +130,109 @@ Käytetty testi: `TestPerformanceOnce`
 
 Yllä olevista diagrammeista (hash funktio deprikaatioon liittyvät diagrammit) havaitaan, että iso osa suoritusajasta menee `GetValidStates` funktion suorittamisesta; noin `1.5` sekunttia. 
 
-Tiedostin, että ohjelmaan ei näillä näkymin tule muiden kuin 4x4 lautojen ratkaisevia implementaatiota. Joten suorituskyvyn parantamiseksi muutin kaikki `board` muuttujaa käsittelevät funktiota ottamaan vain 16:sta olion pituisia `board` muuttujia. Tämän päivityksen ansiosta suorituskyky parani noin viisitoista prosenttia. `board` muuttujan staattisella pituudella oli myös vaikutus muiden funktioiden suorituskykyyn.
+Tiedostin, että ohjelmaan ei näillä näkymin tule muiden kuin 4x4 lautojen ratkaisevia implementaatiota. Joten suorituskyvyn parantamiseksi muutin kaikki `board` muuttujaa käsittelevät funktiota ottamaan vain 16:sta olion pituisia `board` muuttujia. Tämän päivityksen ansiosta suorituskyky parani noin viisitoista prosenttia. `board` muuttujan pituuden muuttaminen staattiseksi vaikutti positiivisesti myös muiden funktioiden suoritusaikaan.
 
 Diagrammi päivityksen jälkeen:
 ![image](https://user-images.githubusercontent.com/22598325/206880447-3f2d4840-0b85-4cff-a54f-676e5e921c4c.png)
 
+### Lisää staattisia muuttujia
+
+[Commit](https://github.com/ferealqq/15GoFast/commit/b2819343a6871c6be710120c3798572fffae6a8c)
+
+Käytetty komento:
+```terminal
+go clean --cache ; go clean -testcache ; go test -run "TestPerformanceOne" -cpuprofile once.prof ; go tool pprof -web once.prof
+```
+Käytetty testi: `TestPerformanceOnce`
+
+`code` funktiossa laskettiin joka suorituksella `BOARD_ROW_SIZE` muuttujan bittien määrä sekä `board` muuttujan pituus. Muutin äsken mainitut dynaamiset arvot staattisiksi arvoiksi siten, että ne lasketaan vain kerran kun ohjelma ensimmäistä kertaa konstruktoidaan. Päivitys ei vaikuttanut merkittävästi sovelluksen suoritusaikaan näin pienellä suoritus ajalla. Päivitys paransi suoritusaikaa n 3 prosenttia.
 
 
-With hash commit   					=> acc9e682af0079d3de72921a6bda3f409d119b31\
-without hash commit 				=> 1772cfb422683a1f2263822c9ba8c7d29cf43996\
-GetValidStates improvements => 901882fa6c9c25075b50451932021cc17931e5c3\
-code improvements 					=> b2819343a6871c6be710120c3798572fffae6a8c\
-memoization 								=> 75e6634be9a880dcae586de56fa01da906736814\
-without SearchState.staes   => 6cb4194badddf5f93fc281904c9b8b48cdad55b4\
-without Move								=> 888be03c76dd06c3f02efac6aa9decdd505f6038
-
-Vertaile without hash commitin graaffia GetValidStates improvementtiin
-
-memoa => without SearchState.states
-
-Static GetValidStates return ja getElementIndex ei käytä generikkejä. noin (-1s) parannus.
+![image](https://user-images.githubusercontent.com/22598325/206880952-8284fc61-6610-49b5-9b2b-f2325243f640.png)
 
 
-Memoization teki algoritmista hitaamman helpommpilla algoritmeillä mutta nopeamman vaikeamilla algoritmeilla.
+### `WalkingDistance.Calculate` funktion memoizointi
+
+[Commit](https://github.com/ferealqq/15GoFast/commit/75e6634be9a880dcae586de56fa01da906736814)
+
+Käytetty komento:
+```terminal
+go clean --cache ; go clean -testcache ; go test -run "TestPerformanceOne" -cpuprofile once.prof ; go tool pprof -web once.prof
+```
+Käytetty testi: `TestPerformanceOnce`
+
+On ilmiselvää, että IDA* algoritmi kutsuu heuristiikka funktiota useamman kerran yhden. Diagrammeista nähdään, että `Calculate` funktion suorittaminen on noin 30 prosenttia koko IDA* algoritmin suoritusajasta. [Memoization](https://en.wikipedia.org/wiki/Memoization) tekniikka on juurikin tälläisiin tarkoituksiin erittäin hyödyllinen. Käytännössä `SearchState` struktuurin funktio `Heuristic` tarkistaa onko se laskenut vielä tietylle `board` muuttujalle heuristiikkaa jos se on laskenut palauttaa funktio arvon suoraan muistista mikäli arvoa ei ole vielä laskettu. 
+
+Päivitys paransi algoritmin suoritusaikaa lähes 50 prosenttia. (Vertaa aikaisempaan diagrammiin, 6s/3s) 
+
+![image](https://user-images.githubusercontent.com/22598325/206881215-0d948f7b-28de-4d0e-b511-b63dd72c6bfb.png)
 
 
+### `SearchState.states` muuttujan deprikointi 
 
-Vertaa miten, viikko 5 suoriutui tietyistä benchmarkeista ja miten viikko 6 lopussa ohjelma suoriutui benchmarkeista. 
+[Commit](https://github.com/ferealqq/15GoFast/commit/6cb4194badddf5f93fc281904c9b8b48cdad55b4)
 
+Käytetty komento:
+```terminal
+go clean --cache ; go clean -testcache ; go test -run "TestPerformanceAverage" -cpuprofile cpu.prof ; go tool pprof -web cpu.prof
+```
+Käytetty testi: `TestPerformanceAverage`
+
+
+En ollut vieläkään tyytyväinen `IDASearch` funktion suoritusaikaan. Diagrammeja tarkastellesse minulle heräsi ajatus, että vaikka `SearchState.states` on oleellinen muuttuja ohjleman toiminnan kannalta se ei pidä sisällään mitään uniikkia tietoa koska kaikki `State` pointterit ovat jo `SearchState.hasSeen` muuttujan sisällä vaikkakin ei oikeassa järjestykssä. `hasSeen` arvot voidaan kuitenkin myöhemmin järjestää oikeaan järjestykseen `State.complexity` olion avulla. 
+
+Kuvassa nähdään kuinka kauan keskiarvoltaan (N = 60) kahden eri `board` muuttujan ratkaisemiseen meni kun `SearchState.states` oli käytössä.
+
+![image](https://user-images.githubusercontent.com/22598325/206881420-588ee18d-1f60-4c83-be0d-c108f2befb9b.png)
+
+
+Ilman `SearchState.states` muuttujaa.
+
+![image](https://user-images.githubusercontent.com/22598325/206881500-89a3a5bf-1520-4105-ae48-acb74c08169b.png)
+
+Kuvankaappauksista näkyy, helpommissa ratkaisuissa suorituskyky parani n 50 prosenttia.
+
+### `State.move` muuttujan deprikointi
+
+[Commit](https://github.com/ferealqq/15GoFast/commit/888be03c76dd06c3f02efac6aa9decdd505f6038)
+
+Käytetty komento:
+```terminal
+go clean --cache ; go clean -testcache ; go test -run "TestPerformanceOne" -cpuprofile once.prof ; go tool pprof -web once.prof
+```
+Käytetty testi: `TestPerformanceOnce`
+
+Ennen.
+![image](https://user-images.githubusercontent.com/22598325/206881577-9a584e8c-0bad-402e-b72f-971778ff10d2.png)
+
+Diagram! Minun lempilapsi ärsyttää jälleen. `GetValidStates` suoritukseen menee noin 13 prosenttia IDASearch funktion suoritusajasta. Ratkaisun löyty jälleen turhan muuttujan heivaamisesta ojaan. Tällä kertaa listalta löytyi `State` struktuurin muuttujassa `move` elänyt struktuuri `Move`. `Move` struktuuri piti sisällään tiedon mihin suuntaan `boardia` oltiin siirtämässä. Tämä tieto on kuitenkin irrelevantti koska `walking distance` heuristiikka pitää kuitenkin laskea koko boardista. `Move` muuttuja oli jäänne niiltä ajoilta kun IDAStar käytti `invert distance` heuristiikkaa.
+
+Simsala bim! `Move` on poistettu ja suorituskyky parani noin 14 prosenttia. (2.6s/3s)
+
+![image](https://user-images.githubusercontent.com/22598325/206881749-e88503bb-4d68-4cb4-be6e-9030a03d29e9.png)
+
+Diagrammista nähdään, että `GetValidState` on enään 8.30 prosenttia `IDASearch` funktion suoritusajasta (ennen 13.6 prosenttia)
+
+
+### Recap
+
+Viiko aloitetiin siitä, että testillä `TestPerformanceOnce` `IDASearch` funktion suoritusaika oli 8 sekunttia ja lopetettiin siihen, että suoritusaika on 3 sekunttia. Suoritusaika parani noin 270 prosenttia.
+
+
+## Mitä viikolla opin?
+
+Viikolla tuli aika paljon opittua `golang` kielen sisäisitä toiminnallisuuksista ja suoritusajan optimoinnista.
+
+
+## Seuraavaks
+
+- Siivotaan koodi
+- Lisätään dokumentointia
+- Hiotaan käyttöliittymästä komia
+- Mennään demoon esittämään siisti softa.
+
+
+Kiitos ja anteeks.
+  
 
 
