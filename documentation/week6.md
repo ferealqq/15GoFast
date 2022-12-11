@@ -2,15 +2,15 @@
 
 ## Suorituskyvyn analysointi 
 
-Mennellää viikolla käytin suurimman osan ajasta algoritmin prosessointi kyvyn parantamiseen.
+Menneellää viikolla käytin suurimman osan ajasta algoritmin prosessointi kyvyn parantamiseen.
 
 Minulla oli selvästi mielessä mitä ohjelmassa oli optimoitavaa jotta se toimisi vielä tehokkaammin.
 
-Kaksi optimisoinnin näkökulmaa jota lähdin tutkimaan:
+Kaksi optimoinnin näkökulmaa jota lähdin tutkimaan:
 - Helpompien taulujen ratkaisu tehokkuuden optimointi.
-- Kompleksimpien taulujen ratkaisuiden tehokkuudn optimointi, jotta algoritmi pystyisi ratkaisemaan myös erittäin moni mutkaiset taulut.
+- Monimutkaisempien taulujen ratkaisujen tehokkuuden optimointi, jotta algoritmi pystyisi ratkaisemaan myös erittäin monimutkaiset taulut.
 
-Suoritus kyky testaukseen löysin sopivaksi työkaluksi [pprof](https://pkg.go.dev/runtime/pprof#pkg-overview). Työlalun avulla kirjoitin kaksi testi skenaariota yllä mainittujen näkökulmien tutkimiseen.
+Suorituskyky testaukseen löysin sopivaksi työkaluksi [pprof](https://pkg.go.dev/runtime/pprof#pkg-overview). Työkalun avulla kirjoitin kaksi testi skenaariota yllä mainittujen näkökulmien tutkimiseen.
 
 Monimutkaisten taulujen ratkaisu kyvyn optimointiin:
 ```golang
@@ -43,10 +43,10 @@ func TestPerformanceOne(t *testing.T) {
 	assert.True(t, node.state.isSuccess())
 }
 ```
-`board` muuttujan ratkaisemiseen tarvitaan 48 siirtoa. Ratkaisun löytämiseen huonosti optimoidulla IDASearch algoritmillä menee noin 10 sekunttia. 
+`board` muuttujan ratkaisemiseen tarvitaan 48 siirtoa. Ratkaisun löytämiseen huonosti optimoidulla IDASearch algoritmillä menee noin 10 sekuntia. 
 
 
-Helpompien taulujen ratkaisu kyvyn optimointiin testi:
+Helpompien taulujen ratkaisukyvyn optimointiin testi:
 ```golang
 func TestPerformanceAverage(t *testing.T) {
 	flag.Parse()
@@ -100,35 +100,35 @@ Loppu tuloksia analysoin `pprof` työkalun luomalla `svg` diagrammilla. Testien 
 
 [Commit](https://github.com/ferealqq/15GoFast/commit/acc9e682af0079d3de72921a6bda3f409d119b31)
 
-Käytetty komento:
+Komento:
 ```terminal
 go clean --cache ; go clean -testcache ; go test -run "TestPerformanceOne" -cpuprofile once.prof ; go tool pprof -web once.prof
 ```
-Käytetty testi: `TestPerformanceOnce`
+Testi: `TestPerformanceOnce`
 
 Kuva diagrammista ennen `hash`
 ![image](https://user-images.githubusercontent.com/22598325/206879795-c09a8c38-6488-4942-874a-444b90d48ac4.png)
 
-Diagrammista näkee, että oikean ratkaisun löytämiseen menee noin 8 sekunttia, josta 1.21 sekunttia käytetään `hash` funktiossa. Joka ei tee ohjelman kannalta mitään erikoista. Funktiota käytettiin `board` lista muuttujien vertailuun koska jokaisen `board` muuttujassa olevan alkion erillinen vertailu olisi turhan raskasta. Tämän takia päätin tehdä funktion joka käyttää base64 enkoodausta esittämään `board` muuttujasta uniikkia avainta jonka avulla voin helposti vertailla `board` muuttujia. base64 enkoodaus on kuitenkin hyvin hidas tähän käyttö tarkoitukseen. Siitä syystä, että sitä kutsuttiin joka kerta kun algoritmi tarkasteli uutta polkua.
+Diagrammista näkee, että oikean ratkaisun löytämiseen menee noin 8 sekuntia, josta 1.21 sekuntia käytetään `hash` funktiossa. Joka ei tee ohjelman kannalta mitään erikoista. Funktiota käytettiin `board` lista muuttujien vertailuun koska jokaisen `board` muuttujassa olevan alkion erillinen vertailu olisi turhan raskasta. Tämän takia päätin tehdä funktion joka käyttää base64 enkoodausta esittämään `board` muuttujasta uniikkia avainta jonka avulla voin helposti vertailla `board` muuttujia. base64 enkoodaus on kuitenkin hyvin hidas tähän käyttötarkoitukseen. Siitä syystä, että sitä kutsuttiin joka kerta kun algoritmi tarkasteli uutta polkua.
 
 Keksin, että tehokkaampi tapa esittää `board` muuttuja avaimena olisi käyttää jo olemassa olevaa `code` funktiota joka luo `int` pohjaisen avaimen. 
 
 Kuva diagrammista jossa käytetään `code` funktiota `hash` funktion sijaan.
 ![image](https://user-images.githubusercontent.com/22598325/206880069-c1b50169-3ea2-4ebf-8992-745813907151.png)
 
-Diagrammista havaitaan, että `code` funktion suoritukseen menee vain `0.26` sekunttia kun taas `hash` funktion suorittamiseen meni `1.21` sekunttia. 
+Diagrammista havaitaan, että `code` funktion suoritukseen menee vain `0.26` sekuntia kun taas `hash` funktion suorittamiseen meni `1.21` sekuntia. 
 
 ### `GetValidStates` tehokkuuden parannus
 
 [Commit](https://github.com/ferealqq/15GoFast/commit/901882fa6c9c25075b50451932021cc17931e5c3)
 
-Käytetty komento:
+Komento:
 ```terminal
 go clean --cache ; go clean -testcache ; go test -run "TestPerformanceOne" -cpuprofile once.prof ; go tool pprof -web once.prof
 ```
-Käytetty testi: `TestPerformanceOnce`
+Testi: `TestPerformanceOnce`
 
-Yllä olevista diagrammeista (hash funktio deprikaatioon liittyvät diagrammit) havaitaan, että iso osa suoritusajasta menee `GetValidStates` funktion suorittamisesta; noin `1.5` sekunttia. 
+Yllä olevista diagrammeista (hash funktio deprikaatioon liittyvät diagrammit) havaitaan, että iso osa suoritusajasta menee `GetValidStates` funktion suorittamisesta; noin `1.5` sekuntia. 
 
 Tiedostin, että ohjelmaan ei näillä näkymin tule muiden kuin 4x4 lautojen ratkaisevia implementaatiota. Joten suorituskyvyn parantamiseksi muutin kaikki `board` muuttujaa käsittelevät funktiota ottamaan vain 16:sta olion pituisia `board` muuttujia. Tämän päivityksen ansiosta suorituskyky parani noin viisitoista prosenttia. `board` muuttujan pituuden muuttaminen staattiseksi vaikutti positiivisesti myös muiden funktioiden suoritusaikaan.
 
@@ -139,11 +139,11 @@ Diagrammi päivityksen jälkeen:
 
 [Commit](https://github.com/ferealqq/15GoFast/commit/b2819343a6871c6be710120c3798572fffae6a8c)
 
-Käytetty komento:
+Komento:
 ```terminal
 go clean --cache ; go clean -testcache ; go test -run "TestPerformanceOne" -cpuprofile once.prof ; go tool pprof -web once.prof
 ```
-Käytetty testi: `TestPerformanceOnce`
+Testi: `TestPerformanceOnce`
 
 `code` funktiossa laskettiin joka suorituksella `BOARD_ROW_SIZE` muuttujan bittien määrä sekä `board` muuttujan pituus. Muutin äsken mainitut dynaamiset arvot staattisiksi arvoiksi siten, että ne lasketaan vain kerran kun ohjelma ensimmäistä kertaa konstruktoidaan. Päivitys ei vaikuttanut merkittävästi sovelluksen suoritusaikaan näin pienellä suoritus ajalla. Päivitys paransi suoritusaikaa n 3 prosenttia.
 
@@ -155,11 +155,11 @@ Käytetty testi: `TestPerformanceOnce`
 
 [Commit](https://github.com/ferealqq/15GoFast/commit/75e6634be9a880dcae586de56fa01da906736814)
 
-Käytetty komento:
+Komento:
 ```terminal
 go clean --cache ; go clean -testcache ; go test -run "TestPerformanceOne" -cpuprofile once.prof ; go tool pprof -web once.prof
 ```
-Käytetty testi: `TestPerformanceOnce`
+Testi: `TestPerformanceOnce`
 
 On ilmiselvää, että IDA* algoritmi kutsuu heuristiikka funktiota useamman kerran yhden. Diagrammeista nähdään, että `Calculate` funktion suorittaminen on noin 30 prosenttia koko IDA* algoritmin suoritusajasta. [Memoization](https://en.wikipedia.org/wiki/Memoization) tekniikka on juurikin tälläisiin tarkoituksiin erittäin hyödyllinen. Käytännössä `SearchState` struktuurin funktio `Heuristic` tarkistaa onko se laskenut vielä tietylle `board` muuttujalle heuristiikkaa jos se on laskenut palauttaa funktio arvon suoraan muistista mikäli arvoa ei ole vielä laskettu. 
 
@@ -172,14 +172,14 @@ Päivitys paransi algoritmin suoritusaikaa lähes 50 prosenttia. (Vertaa aikaise
 
 [Commit](https://github.com/ferealqq/15GoFast/commit/6cb4194badddf5f93fc281904c9b8b48cdad55b4)
 
-Käytetty komento:
+Komento:
 ```terminal
 go clean --cache ; go clean -testcache ; go test -run "TestPerformanceAverage" -cpuprofile cpu.prof ; go tool pprof -web cpu.prof
 ```
-Käytetty testi: `TestPerformanceAverage`
+Testi: `TestPerformanceAverage`
 
 
-En ollut vieläkään tyytyväinen `IDASearch` funktion suoritusaikaan. Diagrammeja tarkastellesse minulle heräsi ajatus, että vaikka `SearchState.states` on oleellinen muuttuja ohjleman toiminnan kannalta se ei pidä sisällään mitään uniikkia tietoa koska kaikki `State` pointterit ovat jo `SearchState.hasSeen` muuttujan sisällä vaikkakin ei oikeassa järjestykssä. `hasSeen` arvot voidaan kuitenkin myöhemmin järjestää oikeaan järjestykseen `State.complexity` olion avulla. 
+En ollut vieläkään tyytyväinen `IDASearch` funktion suoritusaikaan. Diagrammeja tarkastellesse minulle heräsi ajatus, että vaikka `SearchState.states` on oleellinen muuttuja ohjelman toiminnan kannalta se ei pidä sisällään mitään uniikkia tietoa koska kaikki `State` pointterit ovat jo `SearchState.hasSeen` muuttujan sisällä vaikkakin ei oikeassa järjestykssä. `hasSeen` arvot voidaan kuitenkin myöhemmin järjestää oikeaan järjestykseen `State.complexity` olion avulla. 
 
 Kuvassa nähdään kuinka kauan keskiarvoltaan (N = 60) kahden eri `board` muuttujan ratkaisemiseen meni kun `SearchState.states` oli käytössä.
 
@@ -190,24 +190,24 @@ Ilman `SearchState.states` muuttujaa.
 
 ![image](https://user-images.githubusercontent.com/22598325/206881500-89a3a5bf-1520-4105-ae48-acb74c08169b.png)
 
-Kuvankaappauksista näkyy, helpommissa ratkaisuissa suorituskyky parani n 50 prosenttia.
+Kuvankaappauksesta näkyy, helpommissa ratkaisuissa suorituskyky parani n 50 prosenttia.
 
 ### `State.move` muuttujan deprikointi
 
 [Commit](https://github.com/ferealqq/15GoFast/commit/888be03c76dd06c3f02efac6aa9decdd505f6038)
 
-Käytetty komento:
+Komento:
 ```terminal
 go clean --cache ; go clean -testcache ; go test -run "TestPerformanceOne" -cpuprofile once.prof ; go tool pprof -web once.prof
 ```
-Käytetty testi: `TestPerformanceOnce`
+Testi: `TestPerformanceOnce`
 
 Ennen.
 ![image](https://user-images.githubusercontent.com/22598325/206881577-9a584e8c-0bad-402e-b72f-971778ff10d2.png)
 
-Diagram! Minun lempilapsi ärsyttää jälleen. `GetValidStates` suoritukseen menee noin 13 prosenttia IDASearch funktion suoritusajasta. Ratkaisun löyty jälleen turhan muuttujan heivaamisesta ojaan. Tällä kertaa listalta löytyi `State` struktuurin muuttujassa `move` elänyt struktuuri `Move`. `Move` struktuuri piti sisällään tiedon mihin suuntaan `boardia` oltiin siirtämässä. Tämä tieto on kuitenkin irrelevantti koska `walking distance` heuristiikka pitää kuitenkin laskea koko boardista. `Move` muuttuja oli jäänne niiltä ajoilta kun IDAStar käytti `invert distance` heuristiikkaa.
+Diagram! Minun lempilapsi ärsyttää jälleen. `GetValidStates` suorittamiseen menee noin 13 prosenttia IDASearch funktion suoritusajasta. Ratkaisu löyty jälleen turhan muuttujan heivaamisesta ojaan. Tällä kertaa listalta löytyi `State` struktuurin muuttujassa `move` elänyt struktuuri `Move`. `Move` struktuuri piti sisällään tiedon mihin suuntaan `boardia` oltiin siirtämässä. Tämä tieto on kuitenkin irrelevantti koska `walking distance` heuristiikka pitää kuitenkin laskea koko boardista. `Move` muuttuja oli jäänne niiltä ajoilta kun IDAStar käytti `invert distance` heuristiikkaa.
 
-Simsala bim! `Move` on poistettu ja suorituskyky parani noin 14 prosenttia. (2.6s/3s)
+Simsalabim! `Move` on poistettu ja suorituskyky parani noin 14 prosenttia. (2.6s/3s)
 
 ![image](https://user-images.githubusercontent.com/22598325/206881749-e88503bb-4d68-4cb4-be6e-9030a03d29e9.png)
 
@@ -216,12 +216,12 @@ Diagrammista nähdään, että `GetValidState` on enään 8.30 prosenttia `IDASe
 
 ### Recap
 
-Viiko aloitetiin siitä, että testillä `TestPerformanceOnce` `IDASearch` funktion suoritusaika oli 8 sekunttia ja lopetettiin siihen, että suoritusaika on 3 sekunttia. Suoritusaika parani noin 270 prosenttia.
+Viikko aloitetiin siitä, että testillä `TestPerformanceOnce` `IDASearch` funktion suoritusaika oli 8 sekuntia ja lopetettiin siihen, että suoritusaika on 3 sekuntia. Suoritusaika parani noin 270 prosenttia.
 
 
 ## Mitä viikolla opin?
 
-Viikolla tuli aika paljon opittua `golang` kielen sisäisitä toiminnallisuuksista ja suoritusajan optimoinnista.
+Viikolla tuli aika paljon opittua `golang` kielen sisäisistä toiminnallisuuksista ja suoritusajan optimoinnista.
 
 
 ## Seuraavaks
@@ -229,7 +229,7 @@ Viikolla tuli aika paljon opittua `golang` kielen sisäisitä toiminnallisuuksis
 - Siivotaan koodi
 - Lisätään dokumentointia
 - Hiotaan käyttöliittymästä komia
-- Mennään demoon esittämään siisti softa.
+- Esitetään demossa siisti softa.
 
 
 Kiitos ja anteeks.
