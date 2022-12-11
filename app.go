@@ -46,13 +46,26 @@ func (app *App) GetBoard() [16]t_cell {
 
 // generate new board with the app complexity
 func (app *App) GenerateBoard() [16]t_cell {
+	fmt.Println("generate board called")
 	st, err := GenerateState(app.complexity)
+	fmt.Println("generate board returns")
+	fmt.Println(st)
 	if err != nil {
 		// TODO  ?
 		panic(err)
 	}
+	fmt.Printf("search before %p \n",app.search)
 	app.search = NewSearch(st)
+	fmt.Printf("search after %p \n", app.search)
 	return app.GetBoard()
+}
+
+func (app *App) GetDefaultComplexity() int {
+	return DEFAULT_COMPLEXITY
+}
+
+func (app *App) GetDefaultMaxRuntime() int {
+	return DEFAULT_MAX_RUNTIME
 }
 
 func (app *App) SetComplexity(comp t_int) {
@@ -64,11 +77,6 @@ func (app *App) SetMaxRuntime(milliseconds int) {
 }
 
 type IterationData struct {
-	Move struct {
-		EmptyIndex t_cell
-		ToIndex    t_cell
-		Direction  t_direction
-	}
 	Board [16]t_cell
 }
 

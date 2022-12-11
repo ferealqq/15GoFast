@@ -6,6 +6,10 @@ export function GenerateBoard():Promise<any>;
 
 export function GetBoard():Promise<any>;
 
+export function GetDefaultComplexity():Promise<number>;
+
+export function GetDefaultMaxRuntime():Promise<number>;
+
 export function SetComplexity(arg1:number):Promise<void>;
 
 export function SetMaxRuntime(arg1:number):Promise<void>;

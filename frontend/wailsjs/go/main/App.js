@@ -10,6 +10,14 @@ export function GetBoard() {
   return window['go']['main']['App']['GetBoard']();
 }
 
+export function GetDefaultComplexity() {
+  return window['go']['main']['App']['GetDefaultComplexity']();
+}
+
+export function GetDefaultMaxRuntime() {
+  return window['go']['main']['App']['GetDefaultMaxRuntime']();
+}
+
 export function SetComplexity(arg1) {
   return window['go']['main']['App']['SetComplexity'](arg1);
 }
