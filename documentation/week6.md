@@ -100,6 +100,40 @@ Loppu tuloksia analysoin `pprof` työkalun luomalla `svg` diagrammilla. Testien 
 
 [Commit](https://github.com/ferealqq/15GoFast/commit/acc9e682af0079d3de72921a6bda3f409d119b31)
 
+Käytetty komento:
+```terminal
+go clean --cache ; go clean -testcache ; go test -run "TestPerformanceOne" -cpuprofile once.prof ; go tool pprof -web once.prof
+```
+Käytetty testi: `TestPerformanceOnce`
+
+Kuva diagrammista ennen `hash`
+![image](https://user-images.githubusercontent.com/22598325/206879795-c09a8c38-6488-4942-874a-444b90d48ac4.png)
+
+Diagrammista näkee, että oikean ratkaisun löytämiseen menee noin 8 sekunttia, josta 1.21 sekunttia käytetään `hash` funktiossa. Joka ei tee ohjelman kannalta mitään erikoista. Funktiota käytettiin `board` lista muuttujien vertailuun koska jokaisen `board` muuttujassa olevan alkion erillinen vertailu olisi turhan raskasta. Tämän takia päätin tehdä funktion joka käyttää base64 enkoodausta esittämään `board` muuttujasta uniikkia avainta jonka avulla voin helposti vertailla `board` muuttujia. base64 enkoodaus on kuitenkin hyvin hidas tähän käyttö tarkoitukseen. Siitä syystä, että sitä kutsuttiin joka kerta kun algoritmi tarkasteli uutta polkua.
+
+Keksin, että tehokkaampi tapa esittää `board` muuttuja avaimena olisi käyttää jo olemassa olevaa `code` funktiota joka luo `int` pohjaisen avaimen. 
+
+Kuva diagrammista jossa käytetään `code` funktiota `hash` funktion sijaan.
+![image](https://user-images.githubusercontent.com/22598325/206880069-c1b50169-3ea2-4ebf-8992-745813907151.png)
+
+Diagrammista havaitaan, että `code` funktion suoritukseen menee vain `0.26` sekunttia kun taas `hash` funktion suorittamiseen meni `1.21` sekunttia. 
+
+### `GetValidStates` tehokkuuden parannus
+
+[Commit](https://github.com/ferealqq/15GoFast/commit/901882fa6c9c25075b50451932021cc17931e5c3)
+
+Käytetty komento:
+```terminal
+go clean --cache ; go clean -testcache ; go test -run "TestPerformanceOne" -cpuprofile once.prof ; go tool pprof -web once.prof
+```
+Käytetty testi: `TestPerformanceOnce`
+
+Yllä olevista diagrammeista (hash funktio deprikaatioon liittyvät diagrammit) havaitaan, että iso osa suoritusajasta menee `GetValidStates` funktion suorittamisesta; noin `1.5` sekunttia. 
+
+Tiedostin, että ohjelmaan ei näillä näkymin tule muiden kuin 4x4 lautojen ratkaisevia implementaatiota. Joten suorituskyvyn parantamiseksi muutin kaikki `board` muuttujaa käsittelevät funktiota ottamaan vain 16:sta olion pituisia `board` muuttujia. Tämän päivityksen ansiosta suorituskyky parani noin viisitoista prosenttia. `board` muuttujan staattisella pituudella oli myös vaikutus muiden funktioiden suorituskykyyn.
+
+Diagrammi päivityksen jälkeen:
+![image](https://user-images.githubusercontent.com/22598325/206880447-3f2d4840-0b85-4cff-a54f-676e5e921c4c.png)
 
 
 
