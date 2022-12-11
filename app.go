@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"sort"
 
 	_ "net/http/pprof"
 	"time"
@@ -86,18 +87,16 @@ func (app *App) Solve() SolveResult {
 	elapsed := time.Since(now)
 	if status == SUCCESS {
 		boards := make([]IterationData, len(res.hasSeen))
+		boards_slice := []*State{}
 		// TODO range hasSeen sort by complexity
-		for i, _ := range res.hasSeen {
-			// boards[i] = IterationData{Board: state.board, Move: struct {
-			// 	EmptyIndex t_cell
-			// 	ToIndex    t_cell
-			// 	Direction  t_direction
-			// }{
-			// 	EmptyIndex: state.move.emptyIndex,
-			// 	ToIndex:    state.move.toIndex,
-			// 	Direction:  state.move.direction,
-			// }}
-			fmt.Println(boards[i])
+		for _, v := range res.hasSeen {
+			boards_slice = append(boards_slice, v)
+		}
+		sort.Slice(boards_slice, func(i, j int) bool {
+			return boards_slice[j].complexity > boards_slice[i].complexity
+		})
+		for i, v := range boards_slice {
+			boards[i] = IterationData{Board: v.board}
 		}
 		ms := elapsed / time.Millisecond
 		fmt.Println(len(boards))

@@ -107,15 +107,15 @@ func (search *SearchState) IDASearch(cutoff t_int, cost t_int) (STATUS, t_int) {
 		}
 		key := code(next.board)
 		// checks if the board is in the starting position. successCode === startingPosition code
-		if key == search.successCode {
-			search.state = next
-			return SUCCESS, 0
-		}
 		if _, ok := search.hasSeen[key]; ok {
 			continue
 		}
 		search.hasSeen[key] = next
 		search.state = next
+		if key == search.successCode {
+			return SUCCESS, 0
+		}
+		
 		status, probCut := search.IDASearch(cutoff, cost+1)
 		if stop == false || probCut < nextCutoff {
 			stop = true
