@@ -82,12 +82,21 @@ type SolveResult struct {
 
 // returns every iteration of the board while solving
 func (app *App) Solve() SolveResult {
+	if app.search.successCode == codeUniq(app.search.state.board) {
+		return SolveResult{
+			Status: SUCCESS,
+			Iterations: []IterationData{{Board: app.search.state.board}},
+			IterationCount: 0,
+			TimeElapsed: time.Duration(0),
+		}
+	}
 	now := time.Now()
 	fmt.Println("solving")
 	fmt.Println(app.search.state.board)
 	res, status := app.search.IDAStar(app.maxRuntime)
 	elapsed := time.Since(now)
 	if status == SUCCESS {
+		fmt.Println("solved")
 		boards := make([]IterationData, len(res.hasSeen))
 		boards_slice := []*State{}
 		// TODO range hasSeen sort by complexity

@@ -1,15 +1,14 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import { GenerateBoard, GetBoard, Solve } from "../wailsjs/go/main/App";
 import {
-  Text,
   Button,
   ChakraProvider,
   Grid,
   GridItem,
   Heading,
 } from "@chakra-ui/react";
-import { Cycle, CycleState, motion } from "framer-motion";
+import { motion } from "framer-motion";
 
 const EMPTY = 0;
 
@@ -28,10 +27,6 @@ type SolveData = {
   TimeElapsed: number;
 };
 
-type Cell = {
-  value: number;
-};
-
 const isSolved = (board: number[]) : boolean => {
   if(!board) return false
   for (let index = 0; index < board.length; index++) {
@@ -44,18 +39,14 @@ const isSolved = (board: number[]) : boolean => {
 }
 
 function App() {
-  // const [emptyIndex, setEmptyIndex] = useState<number | undefined>(undefined);
   const [isSolving, setSolving] = useState(false);
+  // Depricated
   const [isAnimating, setAnimating] = useState(false);
   const [solveData, setSolveData] = useState<SolveData | undefined>();
+  // boards contains all the iterations of the board if it has been solved. If not this variable will only contain the starting state of the board 
   const [boards, setBoards] = useState<number[][] | undefined>();
 
-  // useEffect(() => {
-  //   if (boards && boards.length > 0) {
-  //     setEmptyIndex(boards[0].findIndex((i) => i === EMPTY));
-  //   }
-  // }, [boards]);
-
+  // set the initial board 
   useEffect(() => {
     if (!boards) {
       // get the board from the golang app
@@ -65,18 +56,21 @@ function App() {
       });
     }
   }, []);
-
+  // solve the current board
   const startSolveTransition = () => {
     if (isSolving) return;
     setSolving(true);
+    // clean the state of the application
     setSolveData(undefined);
     Solve().then((result) => {
       if (result.Status !== Status.SUCCESS) {
         alert("jotain meni pieleen yritä myöhemmin uudellen");
       } else {
+        // start the solving board animation 
         setSolving(false);
         setAnimating(true);
         setSolveData(result);
+        // Iterations contain all the different iterations of the board movements.
         setBoards(result.Iterations.map((item: any) => item.Board))
       }
     });
@@ -85,7 +79,6 @@ function App() {
   return (
     <ChakraProvider>
       <div id="App">
-        {/* FIXME: remove these are for debugging  */}
         <Grid
           templateAreas={`"header header"
                   "nav main"
@@ -166,7 +159,6 @@ const Puzzle = ({ boards, isAnimating }: { boards: number[][], isAnimating: bool
         () => {
           if(index.current < boards.length - 1){
             index.current += 1
-            console.log(`set board with index ${index.current}`,boards[index.current])
             setBoard(boards[index.current])
           }else{
             clearInterval(interval)
@@ -176,33 +168,9 @@ const Puzzle = ({ boards, isAnimating }: { boards: number[][], isAnimating: bool
   
       return () => clearInterval(interval)
     }else if(boards.length === 1){
-      console.log("set board 0 ");
       setBoard(boards[0])
     }
   },[hash(boards)])
-
-  // const [board, cycleBoards,setBoards] = useCycle(...boards);
-  // const [counter,setCounter] = useState(0);
-
-  // let interval : number;
-  // useEffect(()=>{
-  //   setBoards(boards)
-  //   clearInterval(interval);
-  //   cycleBoards(0)
-  // },[hash(boards)])
-  // console.log(`boards length ${boards.length}`)
-  // useEffect(() => {
-  //   if(!isSolved(board) && isAnimating){
-  //     interval = setInterval(
-  //       () => {
-  //         cycleBoards(counter)
-  //         setCounter(counter+1)
-  //       },300
-  //     )
-  
-  //     return () => clearInterval(interval)
-  //   }
-  // }, [isAnimating]);  
 
   return (
     <div
@@ -230,68 +198,5 @@ const Puzzle = ({ boards, isAnimating }: { boards: number[][], isAnimating: bool
     </div>
   );
 };
-
-
-/**
- * Straight from framer-motion source like a cowboy 
- * 
- * Cycles through a series of visual properties. Can be used to toggle between or cycle through animations. It works similar to `useState` in React. It is provided an initial array of possible states, and returns an array of two arguments.
- *
- * An index value can be passed to the returned `cycle` function to cycle to a specific index.
- *
- * ```jsx
- * import * as React from "react"
- * import { motion, useCycle } from "framer-motion"
- *
- * export const MyComponent = () => {
- *   const [x, cycleX] = useCycle(0, 50, 100)
- *
- *   return (
- *     <motion.div
- *       animate={{ x: x }}
- *       onTap={() => cycleX()}
- *      />
- *    )
- * }
- * ```
- *
- * @param items - items to cycle through
- * @returns [currentState, cycleState]
- *
- * @public
- */
-export function useCycle<T>(...propItems: T[]): [T, Cycle, React.Dispatch<React.SetStateAction<T[]>>] {
-  const index = useRef(0)
-  const [items, setItems] = useState(propItems);
-  const [item, setItem] = useState(items[index.current])
-
-  const runCycle = useCallback(
-      (next?: number) => {
-          index.current =
-              typeof next !== "number"
-                  ? wrap(0, items.length, index.current + 1)
-                  : next
-          // console.log("set item with index ", index.current)
-          // console.log("items length", items.length)
-          setItem(items[index.current])
-      },
-      // The array will change on each call, but by putting items.length at
-      // the front of this array, we guarantee the dependency comparison will match up
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      [items.length, ...items]
-  )
-  useEffect(() => {
-    console.log("new items length ", items.length)
-    // @ts-ignore
-  }, [hash(items)])
-  
-  console.log("return item", item)
-  return [item, runCycle, setItems]
-}
-
-export const wrap = (min: number, max: number, v: number) => {
-  const rangeSize = max - min
-  return ((((v - min) % rangeSize) + rangeSize) % rangeSize) + min
-}
 
 export default App;

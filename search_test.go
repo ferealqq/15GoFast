@@ -225,4 +225,20 @@ func TestSearchBugs(t *testing.T) {
 	node, _ = srh.IDAStar(maxRuntimeMS)
 	assert.NotNil(t, node)
 	assert.Equal(t, node.state.board, startingPoint(4))
+
+	board = [16]t_cell{2, 5, 12, 4, 9, 1, 6, 8, 10, 3, 0, 7, 13, 14, 11, 15}
+	state = NewState()
+	state.board = board
+	srh = NewSearch(state)
+	node, _ = srh.IDAStar(maxRuntimeMS)
+	assert.NotNil(t, node)
+	assert.Equal(t, node.state.board, startingPoint(4))
+
+	board = [16]t_cell{1, 10, 2, 3, 5, 0, 11, 4, 13, 6, 8, 12, 14, 9, 15, 7}
+	state = NewState()
+	state.board = board
+	srh = NewSearch(state)
+	node, _ = srh.IDAStar(maxRuntimeMS)
+	assert.NotNil(t, node)
+	assert.Equal(t, node.state.board, startingPoint(4))
 }
