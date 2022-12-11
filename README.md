@@ -59,10 +59,6 @@ go tool pprof search.prof
 
 ## Documentation
 
-### Profiles 
-
-Profile files are [here](https://github.com/ferealqq/15GoFast/blob/main/profiles)
-
 ## GO pkg documentation
 If you want to see the documentation of the application you'll have to have docker installed on your computer. 
 

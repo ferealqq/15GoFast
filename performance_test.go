@@ -112,7 +112,7 @@ func TestPerformanceAverage(t *testing.T) {
 		// defer pprof.StopCPUProfile()
 	} else {
 		// only run the test when we want to capture the memory usage
-		// t.Skip()
+		t.Skip()
 	}
 	maxRuntimeMS := time.Duration(10600)
 	boards := [][16]t_cell{
@@ -163,7 +163,7 @@ func TestPerformanceOne(t *testing.T) {
 		// defer pprof.StopCPUProfile()
 	} else {
 		// only run the test when we want to capture the memory usage
-		// t.Skip()
+		t.Skip()
 	}
 	srh := NewSearch(&State{
 		size:       BOARD_ROW_SIZE,
