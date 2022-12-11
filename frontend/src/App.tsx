@@ -84,7 +84,7 @@ function App() {
                   "nav main"
                   "nav footer"`}
           gridTemplateRows={"80px 1fr 30px"}
-          gridTemplateColumns={"150px 1fr"}
+          gridTemplateColumns={"200px 1fr"}
           h="200px"
           gap="1"
           bg="white"
@@ -122,6 +122,16 @@ function App() {
             style={{ textAlign: "start" }}
           >
             <Heading as="h3" size="lg">
+              Muuttujat 
+            </Heading>
+            {solveData && (
+              <>
+                <p>Solved in: {solveData.TimeElapsed}ms</p>
+                <p>Moves: {solveData.IterationCount}</p>
+              </>
+            )}
+
+            <Heading as="h3" size="lg">
               Data
             </Heading>
             {solveData && (
@@ -134,6 +144,13 @@ function App() {
           <GridItem pl="2" area={"main"}>
             {boards && boards.length > 0 && <Puzzle boards={boards} isAnimating={isAnimating} />}
           </GridItem>
+          {/* <GridItem
+            pl="2"
+            bg="pink.300"
+            area={"ctrl"}
+            style={{ textAlign: "start" }}
+          >
+          </GridItem> */}
         </Grid>
       </div>
     </ChakraProvider>
@@ -168,6 +185,8 @@ const Puzzle = ({ boards, isAnimating }: { boards: number[][], isAnimating: bool
   
       return () => clearInterval(interval)
     }else if(boards.length === 1){
+      // reset the intervals index so that the next animations would be clean
+      index.current = 0
       setBoard(boards[0])
     }
   },[hash(boards)])
@@ -177,22 +196,27 @@ const Puzzle = ({ boards, isAnimating }: { boards: number[][], isAnimating: bool
       style={{
         display: "grid",
         gridTemplateColumns: "auto auto auto auto",
-        gridGap: 10,
+        gridGap: 30,
+        padding: 10,
+        paddingLeft: 20,
+        paddingRight: 20
       }}
     >
       {board && board.map((item) => (
         <motion.div
           style={{
-            width: 75,
-            height: 75,
-            borderRadius: 20,
+            width: "auto",
+            height: 80,
+            borderRadius: 15,
             backgroundColor: "lightblue",
+            display: "flex",
+            justifyContent: "center"
           }}
           key={item}
           layout
           transition={{ type: "spring", stiffness: 350, damping: 25 }}
         >
-          <p> {item} </p>
+          <Heading textAlign={"center"} margin="auto"> {item} </Heading>
         </motion.div>
       ))}
     </div>
