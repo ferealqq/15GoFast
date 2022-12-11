@@ -4,8 +4,6 @@ import {
   GenerateBoard,
   GetBoard,
   Solve,
-  GetDefaultComplexity,
-  GetDefaultMaxRuntime,
   SetComplexity,
   SetMaxRuntime,
 } from "../wailsjs/go/main/App";
@@ -19,17 +17,16 @@ import {
   Grid,
   GridItem,
   Heading,
-  Input,
   NumberInput,
   NumberInputField,
   SimpleGrid,
+  Colors,
 } from "@chakra-ui/react";
 import { Field, Form, Formik } from "formik";
-import { motion, MotionConfigContext } from "framer-motion";
-import Lottie from "lottie-react";
+import { motion } from "framer-motion";
+import Lottie, { LottieRefCurrentProps } from "lottie-react";
 import atomAnimation from "./loading-atom.json";
-
-const EMPTY = 0;
+// import { Token } from '@chakra-ui/styled-system'
 
 enum Status {
   FAILURE = 0,
@@ -37,6 +34,14 @@ enum Status {
   CUTOFF = 2,
   TIME_EXCEEDED = 3,
 }
+
+type AppState =
+  | "SOLVED"
+  | "TIME_EXCEEDED"
+  | "SOLVING"
+  | "ANIMATING"
+  | "WAITING"
+  | "FAIL";
 
 type SolveData = {
   Status: Status;
@@ -46,28 +51,14 @@ type SolveData = {
   TimeElapsed: number;
 };
 
-const isSolved = (board: number[]): boolean => {
-  if (!board) return false;
-  for (let index = 0; index < board.length; index++) {
-    if (index === board.length - 1 && board[index] === 0) return true;
-    if (board[index] !== index + 1) {
-      return false;
-    }
-  }
-  return false;
-};
+const COMPLEXITY_WARNING = 10000;
 
-const COMPLEXITY_WARNING = 700;
-const RUNTIME_COMPLEXITY_WARNING = 15000;
 const DEFAULT_MOVE_ANIMATION_TIME = 200;
-
-const DEFAULT_COMPLEXITY = 150;
-const DEFAULT_MAX_RUNTIME = 1500;
+const DEFAULT_COMPLEXITY = 320;
+const DEFAULT_MAX_RUNTIME = 5500;
 
 function App() {
-  const [isSolving, setSolving] = useState(false);
   // Depricated
-  const [isAnimating, setAnimating] = useState(false);
   const [solveData, setSolveData] = useState<SolveData | undefined>();
   // boards contains all the iterations of the board if it has been solved. If not this variable will only contain the starting state of the board
   const [boards, setBoards] = useState<number[][] | undefined>();
@@ -76,6 +67,7 @@ function App() {
   const [moveAnimationTime, setMoveAnimationTime] = useState<number>(
     DEFAULT_MOVE_ANIMATION_TIME
   );
+  const [appState, setAppState] = useState<AppState>("WAITING");
   const [complexityConfirmed, setCompConfirmed] = useState(false);
   // set the initial board
   useEffect(() => {
@@ -89,10 +81,10 @@ function App() {
 
   const resetBoard = () => {
     // golang backend will brake down if we generate a new board while solving the current one.
-    if (isSolving) return;
+    if (appState === "SOLVING") return;
     GenerateBoard().then((board) => {
       setBoards([board]);
-      setAnimating(false);
+      setAppState("WAITING");
     });
   };
   const validateNumber = (value: number): undefined | string => {
@@ -111,7 +103,6 @@ function App() {
       );
       if (!answer) return;
       setCompConfirmed(true);
-      setMaxruntime(RUNTIME_COMPLEXITY_WARNING);
     }
     // sync the go backend and the react frontend
     SetComplexity(comp);
@@ -122,25 +113,34 @@ function App() {
   const setMaxruntime = (max: number) => {
     SetMaxRuntime(max);
     _setMaxruntime(max);
-    resetBoard();
   };
 
   // solve the current board
   const startSolveTransition = () => {
-    if (isSolving) return;
-    setSolving(true);
+    if (appState === "SOLVING") return;
+    setAppState("SOLVING");
     // clean the state of the application
     setSolveData(undefined);
     Solve().then((result) => {
-      if (result.Status !== Status.SUCCESS) {
-        alert("Something went wrong try again later.");
-      } else {
-        // start the solving board animation
-        setSolving(false);
-        setAnimating(true);
-        setSolveData(result);
-        // Iterations contain all the different iterations of the board movements.
-        setBoards(result.Iterations.map((item: any) => item.Board));
+      switch (result.Status) {
+        case Status.SUCCESS:
+          // start the solving board animation
+          setAppState("ANIMATING");
+          setSolveData(result);
+          // Iterations contain all the different iterations of the board movements.
+          setBoards(result.Iterations.map((item: any) => item.Board));
+
+          break;
+        case Status.TIME_EXCEEDED:
+          setAppState("TIME_EXCEEDED");
+          break;
+
+        case Status.FAILURE:
+          setAppState("FAIL");
+          break;
+
+        default:
+          break;
       }
     });
   };
@@ -172,8 +172,12 @@ function App() {
             padding={3}
           >
             <Heading>15 Puzzle solver:</Heading>
-            {isSolving && <SolvingAnimation />}
-            {!isSolving && isAnimating && <SolvedText />}
+            {/* <AnimatingText></AnimatingText> */}
+            {appState === "SOLVING" && <SolvingAnimation />}
+            {appState === "SOLVED" && <SolvedText />}
+            {appState === "ANIMATING" && <AnimatingText />}
+            {appState === "TIME_EXCEEDED" && <TimeExceededText />}
+            {appState === "FAIL" && <FailText />}
           </GridItem>
           <GridItem
             pl="2"
@@ -206,7 +210,7 @@ function App() {
                 bg="cyan.700"
                 color="cyan.50"
                 onClick={() => {
-                  if (isSolving) {
+                  if (appState === "SOLVING") {
                     alert(
                       "Can't generate new board whilst solving the current one."
                     );
@@ -270,7 +274,7 @@ function App() {
                           form.errors.maxRuntime && form.touched.maxRuntime
                         }
                       >
-                        <FormLabel>Runtime time limit (ms)</FormLabel>
+                        <FormLabel>Time limit (ms)</FormLabel>
                         <NumberInput min={1} defaultValue={DEFAULT_MAX_RUNTIME}>
                           <NumberInputField
                             onChange={(evt) =>
@@ -346,8 +350,9 @@ function App() {
             {boards && boards.length > 0 && (
               <Puzzle
                 boards={boards}
-                isAnimating={isAnimating}
+                isAnimating={appState === "ANIMATING"}
                 moveAnimationTime={moveAnimationTime}
+                onAnimationEnd={() => setAppState("SOLVED")}
               />
             )}
           </GridItem>
@@ -374,10 +379,12 @@ const Puzzle = ({
   boards,
   isAnimating,
   moveAnimationTime,
+  onAnimationEnd,
 }: {
   boards: number[][];
   isAnimating: boolean;
   moveAnimationTime: number;
+  onAnimationEnd: () => void;
 }) => {
   const index = useRef(0);
   const [board, setBoard] = useState(boards[0]);
@@ -389,6 +396,7 @@ const Puzzle = ({
           index.current += 1;
           setBoard(boards[index.current]);
         } else {
+          onAnimationEnd();
           clearInterval(interval);
         }
       }, moveAnimationTime);
@@ -441,20 +449,76 @@ const Puzzle = ({
     </div>
   );
 };
+const containerVariants = {
+  initial: {
+    transition: {
+      staggerChildren: 0.2,
+    },
+  },
+  animate: {
+    transition: {
+      staggerChildren: 0.2,
+    },
+  },
+};
 
-const SolvedText = () => {
+const spanStyle = {
+  fontSize: "var(--chakra-fontSizes-4xl)",
+  lineHeight: "1.2",
+  color: "var(--chakra-colors-cyan-800)",
+  display: "block",
+};
+
+const textTransition = {
+  duration: 0.9,
+  yoyo: Infinity,
+  ease: "easeInOut",
+};
+
+const FunkyText = ({ children }: { children: string }) => {
+  const splitted = children.split("");
   return (
-    <Container>
-      <Heading as="h5" size="xl" color="cyan.800">
-        Solved
-      </Heading>
+    <motion.div
+      style={{ display: "flex" }}
+      variants={containerVariants}
+      initial="initial"
+      animate="animate"
+    >
+      {splitted.map((char, i) => {
+        return (
+          <motion.span
+            style={spanStyle}
+            variants={{
+              initial: {
+                color: "#0BC5EA",
+              },
+              animate: {
+                color: "#065666",
+              },
+            }}
+            transition={textTransition}
+            key={i}
+          >
+            {char}
+          </motion.span>
+        );
+      })}
+    </motion.div>
+  );
+};
+
+const AnimatingText = () => {
+  return (
+    <Container display="flex" justifyContent={"center"}>
+      <StatusText>Solved:</StatusText>
+      <span style={{ paddingLeft: "10px" }} />
+      <FunkyText> Animating</FunkyText>
     </Container>
   );
 };
 
-
 const SolvingAnimation = () => {
-  const lot = useRef();
+  const lot = useRef<LottieRefCurrentProps | null>(null);
   useEffect(() => {
     if (lot.current) {
       // @ts-ignore
@@ -464,9 +528,7 @@ const SolvingAnimation = () => {
 
   return (
     <Container>
-      <Heading as="h5" size="xl" color="cyan.800">
-        Solving
-      </Heading>
+      <StatusText>Solving</StatusText>
       <Lottie
         lottieRef={lot}
         animationData={atomAnimation}
@@ -475,5 +537,46 @@ const SolvingAnimation = () => {
     </Container>
   );
 };
+
+const StatusText = ({
+  children,
+  color = "cyan.800",
+}: {
+  children: string;
+  color?: string;
+}) => {
+  return (
+    <Heading as="h5" size="xl" color={color}>
+      {children}
+    </Heading>
+  );
+};
+
+const StatusContainer = ({
+  children,
+  color = "cyan.800",
+}: {
+  children: string;
+  color?: string;
+}) => (
+  <Container>
+    <StatusText color={color}>{children}</StatusText>
+  </Container>
+);
+
+const SolvedText = () => {
+  return <StatusContainer>Solved!</StatusContainer>;
+};
+
+const TimeExceededText = () => (
+  <StatusContainer color="red.400">
+    Time limit exceeded, trying again with higher time limit!
+  </StatusContainer>
+);
+const FailText = () => (
+  <StatusContainer color="red.400">
+    Unexpected error, maybe some funky math stuff!
+  </StatusContainer>
+);
 
 export default App;

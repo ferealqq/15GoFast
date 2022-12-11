@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -40,10 +39,9 @@ func TestIsSolvable(t *testing.T) {
 }
 
 func TestGenerateState(t *testing.T) {
-	state, e := GenerateState(80)
+	_, e := GenerateState(80)
 	assert.Nil(t, e)
 
-	fmt.Println(state.board)
 	// TODO rewrite this test or find out why solvable is not working correctly?
 	// assert.True(t, isSolvable(state.board))
 	assert.True(t, true)

@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"sort"
 
 	_ "net/http/pprof"
@@ -46,17 +45,12 @@ func (app *App) GetBoard() [16]t_cell {
 
 // generate new board with the app complexity
 func (app *App) GenerateBoard() [16]t_cell {
-	fmt.Println("generate board called")
 	st, err := GenerateState(app.complexity)
-	fmt.Println("generate board returns")
-	fmt.Println(st)
 	if err != nil {
 		// TODO  ?
 		panic(err)
 	}
-	fmt.Printf("search before %p \n",app.search)
 	app.search = NewSearch(st)
-	fmt.Printf("search after %p \n", app.search)
 	return app.GetBoard()
 }
 
@@ -99,12 +93,9 @@ func (app *App) Solve() SolveResult {
 		}
 	}
 	now := time.Now()
-	fmt.Println("solving")
-	fmt.Println(app.search.state.board)
 	res, status := app.search.IDAStar(app.maxRuntime)
 	elapsed := time.Since(now)
 	if status == SUCCESS {
-		fmt.Println("solved")
 		boards := make([]IterationData, len(res.hasSeen))
 		boards_slice := []*State{}
 		// TODO range hasSeen sort by complexity
@@ -118,7 +109,6 @@ func (app *App) Solve() SolveResult {
 			boards[i] = IterationData{Board: v.board}
 		}
 		ms := elapsed / time.Millisecond
-		fmt.Println(len(boards))
 		return SolveResult{
 			SUCCESS,
 			boards,

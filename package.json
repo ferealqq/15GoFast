@@ -1,7 +1,0 @@
-{
-  "dependencies": {
-    "formik": "^2.2.9",
-    "framer-motion": "^7.6.18",
-    "lottie-react": "^2.3.1"
-  }
-}

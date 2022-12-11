@@ -138,14 +138,3 @@ func (search *SearchState) IDASearch(cutoff t_int, cost t_int) (STATUS, t_int) {
 
 	return FAILURE, -1
 }
-
-func (search *SearchState) printMoves() {
-	for _, s := range search.hasSeen {
-		// fmt.Println(s.board)
-		fmt.Printf("%d ", s.complexity)
-		// if s.move != nil {
-		// 	fmt.Printf(" %s ", s.move.directionString())
-		// }
-	}
-	fmt.Printf("\n")
-}
