@@ -9,8 +9,8 @@ import (
 	"time"
 )
 
-const DEFAULT_COMPLEXITY = 200
-const DEFAULT_MAX_RUNTIME = 2300
+const DEFAULT_COMPLEXITY = 80
+const DEFAULT_MAX_RUNTIME = 5000
 
 // App struct
 type App struct {
@@ -83,6 +83,8 @@ type SolveResult struct {
 // returns every iteration of the board while solving
 func (app *App) Solve() SolveResult {
 	now := time.Now()
+	fmt.Println("solving")
+	fmt.Println(app.search.state.board)
 	res, status := app.search.IDAStar(app.maxRuntime)
 	elapsed := time.Since(now)
 	if status == SUCCESS {

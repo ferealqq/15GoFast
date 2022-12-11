@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import "./App.css";
 import { GenerateBoard, GetBoard, Solve } from "../wailsjs/go/main/App";
 import {
@@ -9,7 +9,7 @@ import {
   GridItem,
   Heading,
 } from "@chakra-ui/react";
-import { motion, useCycle } from "framer-motion";
+import { Cycle, CycleState, motion } from "framer-motion";
 
 const EMPTY = 0;
 
@@ -60,6 +60,7 @@ function App() {
     if (!boards) {
       // get the board from the golang app
       GetBoard().then((board) => {
+        console.log("first board",board)
         setBoards([board]);
       });
     }
@@ -113,6 +114,7 @@ function App() {
               onClick={() => {
                 GenerateBoard().then((board) => {
                   setBoards([board])
+                  console.log("reset board", board)
                   setAnimating(false)
                 });
               }}
@@ -137,7 +139,7 @@ function App() {
             )}
           </GridItem>
           <GridItem pl="2" area={"main"}>
-            {boards && <Puzzle boards={boards} isAnimating={isAnimating} />}
+            {boards && boards.length > 0 && <Puzzle boards={boards} isAnimating={isAnimating} />}
           </GridItem>
         </Grid>
       </div>
@@ -145,28 +147,62 @@ function App() {
   );
 }
 
+function hash(boards : number[][]) : string {
+  const str = boards.map(board => {
+    return board.map(val => {
+      return String.fromCharCode(val)
+    }).join("");
+  }).join("")
+  return encodeURI(str);
+}
+
 const Puzzle = ({ boards, isAnimating }: { boards: number[][], isAnimating: boolean }) => {
-  console.log(...boards)
-  const [board, cycleBoards] = useCycle(...boards);
-  const [counter,setCounter] = useState(0);
+  const index = useRef(0);
+  const [board,setBoard] = useState(boards[0]);
 
   useEffect(()=>{
-    cycleBoards(0)
-  },[boards])
-  useEffect(() => {
-    // if(!board) return;
-    if(!isSolved(board)){
+    if(boards.length > 1){
       let interval = setInterval(
         () => {
-          // console.log(counter)
-          cycleBoards(counter)
-          setCounter(counter+1)
+          if(index.current < boards.length - 1){
+            index.current += 1
+            console.log(`set board with index ${index.current}`,boards[index.current])
+            setBoard(boards[index.current])
+          }else{
+            clearInterval(interval)
+          }
         },300
       )
-
+  
       return () => clearInterval(interval)
+    }else if(boards.length === 1){
+      console.log("set board 0 ");
+      setBoard(boards[0])
     }
-  }, [board, cycleBoards,isAnimating]);  
+  },[hash(boards)])
+
+  // const [board, cycleBoards,setBoards] = useCycle(...boards);
+  // const [counter,setCounter] = useState(0);
+
+  // let interval : number;
+  // useEffect(()=>{
+  //   setBoards(boards)
+  //   clearInterval(interval);
+  //   cycleBoards(0)
+  // },[hash(boards)])
+  // console.log(`boards length ${boards.length}`)
+  // useEffect(() => {
+  //   if(!isSolved(board) && isAnimating){
+  //     interval = setInterval(
+  //       () => {
+  //         cycleBoards(counter)
+  //         setCounter(counter+1)
+  //       },300
+  //     )
+  
+  //     return () => clearInterval(interval)
+  //   }
+  // }, [isAnimating]);  
 
   return (
     <div
@@ -194,5 +230,68 @@ const Puzzle = ({ boards, isAnimating }: { boards: number[][], isAnimating: bool
     </div>
   );
 };
+
+
+/**
+ * Straight from framer-motion source like a cowboy 
+ * 
+ * Cycles through a series of visual properties. Can be used to toggle between or cycle through animations. It works similar to `useState` in React. It is provided an initial array of possible states, and returns an array of two arguments.
+ *
+ * An index value can be passed to the returned `cycle` function to cycle to a specific index.
+ *
+ * ```jsx
+ * import * as React from "react"
+ * import { motion, useCycle } from "framer-motion"
+ *
+ * export const MyComponent = () => {
+ *   const [x, cycleX] = useCycle(0, 50, 100)
+ *
+ *   return (
+ *     <motion.div
+ *       animate={{ x: x }}
+ *       onTap={() => cycleX()}
+ *      />
+ *    )
+ * }
+ * ```
+ *
+ * @param items - items to cycle through
+ * @returns [currentState, cycleState]
+ *
+ * @public
+ */
+export function useCycle<T>(...propItems: T[]): [T, Cycle, React.Dispatch<React.SetStateAction<T[]>>] {
+  const index = useRef(0)
+  const [items, setItems] = useState(propItems);
+  const [item, setItem] = useState(items[index.current])
+
+  const runCycle = useCallback(
+      (next?: number) => {
+          index.current =
+              typeof next !== "number"
+                  ? wrap(0, items.length, index.current + 1)
+                  : next
+          // console.log("set item with index ", index.current)
+          // console.log("items length", items.length)
+          setItem(items[index.current])
+      },
+      // The array will change on each call, but by putting items.length at
+      // the front of this array, we guarantee the dependency comparison will match up
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [items.length, ...items]
+  )
+  useEffect(() => {
+    console.log("new items length ", items.length)
+    // @ts-ignore
+  }, [hash(items)])
+  
+  console.log("return item", item)
+  return [item, runCycle, setItems]
+}
+
+export const wrap = (min: number, max: number, v: number) => {
+  const rangeSize = max - min
+  return ((((v - min) % rangeSize) + rangeSize) % rangeSize) + min
+}
 
 export default App;

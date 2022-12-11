@@ -192,6 +192,16 @@ func TestSearchStuck(t *testing.T) {
 	assert.Equal(t, node.state.board, startingPoint(4))
 }
 
+func TestSearchAlreadySolved(t *testing.T) {
+	board := startingPoint(4)
+	state := NewState()
+	state.board = board
+	srh := NewSearch(state)
+	node, _ := srh.IDAStar(maxRuntimeMS)
+	assert.NotNil(t, node)
+	assert.Equal(t, node.state.board, startingPoint(4))
+}
+
 func TestSearchBugs(t *testing.T) {
 	board := [16]t_cell{1, 2, 3, 4, 5, 6, 7, 8, 0, 9, 10, 12, 13, 14, 11, 15}
 	state := NewState()
