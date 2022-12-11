@@ -83,7 +83,7 @@ func GenerateState(complexity t_int) (*State, error) {
 
 	rand.Seed(time.Now().UnixNano())
 	for state.complexity < complexity {
-		visited = append(visited, code(state.board))
+		visited = append(visited, codeUniq(state.board))
 		sts := state.GetValidStates()
 		filtered := []*State{}
 		for _, next := range sts {
@@ -91,7 +91,7 @@ func GenerateState(complexity t_int) (*State, error) {
 				continue
 			}
 			for j := range visited {
-				if visited[j] != code(next.board) {
+				if visited[j] != codeUniq(next.board) {
 					filtered = append(filtered, next)
 					break
 				}

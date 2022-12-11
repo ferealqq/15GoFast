@@ -24,9 +24,19 @@ func nVisit(cost t_cell, board [16]t_cell, e t_cell) *visitSt {
 
 // Generates a unique int representation of the board. Generates the same int for the same board every time, becuase it shifts the bits according to the value and index positions
 func code(board [16]t_cell) int {
+	// FIXME: some times returns the same code for a different board
 	r := 0
 	for i := range board {
 		r |= int(board[i]) << (bitsLen * i)
+	}
+	return r
+}
+
+
+func codeUniq(board [16]t_cell) int {
+	r := 0
+	for i := range board {
+		r |= int(board[i]) << (bitsLen * i + i)
 	}
 	return r
 }

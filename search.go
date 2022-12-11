@@ -25,7 +25,7 @@ func NewSearch(state *State) *SearchState {
 	srh := &SearchState{
 		state:       state,
 		hasSeen:     make(map[int]*State),
-		successCode: code(startingPoint(state.size)),
+		successCode: codeUniq(startingPoint(state.size)),
 	}
 
 	srh.Heuristic = srh.memo(wd.Calculate)
@@ -40,7 +40,7 @@ func (search *SearchState) memo(fn heurFn) heurFn {
 	cache := make(map[int]int)
 
 	return func(input [16]t_cell) int {
-		key := code(input)
+		key := codeUniq(input)
 		if val, found := cache[key]; found {
 			return val
 		}
@@ -105,8 +105,8 @@ func (search *SearchState) IDASearch(cutoff t_int, cost t_int) (STATUS, t_int) {
 		if next == nil {
 			continue
 		}
-		key := code(next.board)
-		// checks if the board is in the starting position. successCode === startingPosition code
+		key := codeUniq(next.board)
+		// checks if the board is in the starting position. successCode === startingPosition codeUniq
 		if _, ok := search.hasSeen[key]; ok {
 			continue
 		}
@@ -115,7 +115,7 @@ func (search *SearchState) IDASearch(cutoff t_int, cost t_int) (STATUS, t_int) {
 		if key == search.successCode {
 			return SUCCESS, 0
 		}
-		
+
 		status, probCut := search.IDASearch(cutoff, cost+1)
 		if stop == false || probCut < nextCutoff {
 			stop = true

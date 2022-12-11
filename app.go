@@ -9,8 +9,8 @@ import (
 	"time"
 )
 
-const DEFAULT_COMPLEXITY = 130
-const DEFAULT_MAX_RUNTIME = 1300
+const DEFAULT_COMPLEXITY = 200
+const DEFAULT_MAX_RUNTIME = 2300
 
 // App struct
 type App struct {
