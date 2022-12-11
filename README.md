@@ -2,7 +2,22 @@
 
 ## About
 
-15Puzzle game solver
+15 puzzle solver implementation.
+
+![](15GoFast.gif)
+
+
+### Stack
+
+- Algo     : [IDA*](https://en.wikipedia.org/wiki/Iterative_deepening_A*)
+- Heuristic: [Walking distance](https://web.archive.org/web/20141224035932/http://juropollo.xe0.ru:80/stp_wd_translation_en.htm)
+- Frontend : [Wails (React)](https://wails.io/)
+- Language : [golang](https://go.dev)
+
+### Dependencies
+- [Wails (React)](https://wails.io/)
+- [golang](https://go.dev)
+- [Node](https>//nodejs.org)
 
 ## Reports
 
