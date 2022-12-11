@@ -4,6 +4,9 @@ package main
 
 import (
 	"embed"
+	"log"
+	"net/http"
+	_ "net/http/pprof"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -14,6 +17,9 @@ import (
 var assets embed.FS
 
 func main() {
+	go func() {
+		log.Println(http.ListenAndServe("localhost:6060", nil))
+	}()
 	// Create an instance of the app structure
 	app := NewApp()
 
