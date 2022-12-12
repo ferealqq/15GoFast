@@ -3,17 +3,33 @@ name: Release the newest version
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 jobs:
   build:
     strategy:
       fail-fast: false
       matrix:
-        build: [
-          {name: 15GoFast-linux-amd, platform: linux/amd64, os: ubuntu-latest},
-          {name: 15GoFast-windows, platform: windows/amd64, os: windows-latest},
-          {name: 15GoFast-darwin, platform: darwin/universal, os: macos-latest}
-        ]
+        build:
+          [
+            {
+              name: 15GoFast-linux-amd,
+              platform: linux/amd64,
+              os: ubuntu-latest,
+              sign: "false",
+            },
+            {
+              name: 15GoFast-windows,
+              platform: windows/amd64,
+              os: windows-latest,
+              sign: "false",
+            },
+            {
+              name: 15GoFast-darwin,
+              platform: darwin/universal,
+              os: macos-latest,
+              sign: "false",
+            },
+          ]
     runs-on: ${{ matrix.build.os }}
     steps:
       - uses: actions/checkout@v2
@@ -25,6 +41,7 @@ jobs:
           go-version: 1.18
           build-name: ${{ matrix.build.name }}
           build-platform: ${{ matrix.build.platform }}
+          sign: ${{matrix.build.sign}}
 
       # Upload build assets
       - uses: actions/upload-artifact@v2
