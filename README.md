@@ -1,11 +1,14 @@
-# README
-
-## About
-
-15 puzzle solver implementation.
+# 15GoFast :dizzy:
 
 ![](15GoFast.gif)
 
+## About
+
+15 puzzle solver implementation with [golang](https://go.dev).
+
+Generally the algorithmic implementation of the application focuses on the fastest possible solve time. In hindsight the implementation could be even faster, but generally the algorithm implementation achieves faster solve times than many other 15 puzzle solvers. I’ll add some proof to these claims <i>later</i>.
+
+</br>
 
 ### Stack
 
@@ -28,8 +31,32 @@
 [week 5](https://github.com/ferealqq/15GoFast/blob/main/documentation/week5.md)
 [week 6](https://github.com/ferealqq/15GoFast/blob/main/documentation/week6.md)
 
-After you have successfully started the documentation server you can find the documentation via this [path](http://localhost:6060/pkg/github.com/ferealqq/15GoFast/)
+## Usage
 
+### Executable applications can be found under the `release` folder
+
+Release contains only `linux-amd64` and `darwin (macos)` executables. If you are using windows or other OS linux distribution and want to test the application you should compile the [executable yourself](##building).
+
+Start:
+```terminal
+./release/15GoFast_linux_amd
+# or 
+./release/15GoFast_darwin
+```
+
+## Installation 
+
+- Install node: [here](https://nodejs.org/en/download/)
+- Install golang: [here](https://go.dev/doc/install)
+- Install wails: [guide](https://wails.io/docs/gettingstarted/installation)
+  - If you are familiar with go you can install wails with command: `go install github.com/wailsapp/wails/v2/cmd/wails@latest`
+
+Run:
+```terminal
+go mod download 
+npm install
+wails dev
+```
 
 ## Live Development
 
@@ -47,11 +74,11 @@ To build a redistributable, production mode package, use `wails build`.
 
 To test the core logic of the application run: 
 ```terminal
-# takes 5s to 25s depending on how hard the random generated puzzles are.
+# takes 1s to 8s depending on how hard the random generated puzzles are.
 go test . 
 ```
 
-Some times the tests may exceed the time limit of solving the puzzle board. But exceeding the time limit should be very rare.
+Some times the tests may exceed the time limit of solving the puzzle board. But exceeding the time limit should be very <i>rare</i>.
 
 ## Profiling 
 
@@ -69,17 +96,4 @@ Generate IDAStar's cpu profile run
 go clean --cache ; go clean -testcache ; go test -run "TestPerformance" -cpuprofile cpu.prof
 go tool pprof search.prof
 (pprof) web
-```
-
-
-## Documentation
-
-## GO pkg documentation
-If you want to see the documentation of the application you'll have to have docker installed on your computer. 
-
-To start the documentation server use script `run_documentation.sh`
-Example: 
-```terminal
-chmod +x run_documentation.sh
-./run_documentation.sh
 ```
