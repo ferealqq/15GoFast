@@ -32,11 +32,10 @@ func code(board [16]t_cell) int {
 	return r
 }
 
-
 func codeUniq(board [16]t_cell) int {
 	r := 0
 	for i := range board {
-		r |= int(board[i]) << (bitsLen * i + i)
+		r |= int(board[i]) << (bitsLen*i + i)
 	}
 	return r
 }

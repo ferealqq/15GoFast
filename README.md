@@ -39,9 +39,17 @@ Release contains only `linux-amd64` and `darwin (macos)` executables. If you are
 
 Start:
 ```terminal
-./release/15GoFast_linux_amd
-# or 
-./release/15GoFast_darwin
+# linux 
+wget https://github.com/ferealqq/15GoFast/releases/download/latest/15GoFast_linux_amd
+chmod +x 15GoFast_linux_amd
+./15GoFast_linux_amd
+```
+
+```terminal
+# macos  
+wget https://github.com/ferealqq/15GoFast/releases/download/latest/15GoFast_darwin
+chmod +x 15GoFast_darwin
+./15GoFast_darwin
 ```
 
 ## Installation 
@@ -53,8 +61,6 @@ Start:
 
 Run:
 ```terminal
-go mod download 
-npm install
 wails dev
 ```
 

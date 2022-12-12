@@ -86,10 +86,10 @@ type SolveResult struct {
 func (app *App) Solve() SolveResult {
 	if app.search.successCode == codeUniq(app.search.state.board) {
 		return SolveResult{
-			Status: SUCCESS,
-			Iterations: []IterationData{{Board: app.search.state.board}},
+			Status:         SUCCESS,
+			Iterations:     []IterationData{{Board: app.search.state.board}},
 			IterationCount: 0,
-			TimeElapsed: time.Duration(0),
+			TimeElapsed:    time.Duration(0),
 		}
 	}
 	now := time.Now()

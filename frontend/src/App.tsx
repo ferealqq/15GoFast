@@ -51,10 +51,8 @@ type SolveData = {
   TimeElapsed: number;
 };
 
-const COMPLEXITY_WARNING = 10000;
-
 const DEFAULT_MOVE_ANIMATION_TIME = 200;
-const DEFAULT_COMPLEXITY = 320;
+const DEFAULT_COMPLEXITY = 500;
 const DEFAULT_MAX_RUNTIME = 5500;
 
 function App() {
@@ -68,7 +66,6 @@ function App() {
     DEFAULT_MOVE_ANIMATION_TIME
   );
   const [appState, setAppState] = useState<AppState>("WAITING");
-  const [complexityConfirmed, setCompConfirmed] = useState(false);
   // set the initial board
   useEffect(() => {
     if (!boards) {
@@ -97,13 +94,6 @@ function App() {
   const setComplexity = (comp: number) => {
     // if validate complexity returns something else than undefiend it means that the validation didn't go through
     if (validateNumber(comp)) return;
-    if (comp > COMPLEXITY_WARNING && !complexityConfirmed) {
-      const answer = confirm(
-        `Are you sure, solving a board with complexity over ${COMPLEXITY_WARNING} could take up to 15 seconds`
-      );
-      if (!answer) return;
-      setCompConfirmed(true);
-    }
     // sync the go backend and the react frontend
     SetComplexity(comp);
     _setComplexity(comp);
@@ -186,7 +176,7 @@ function App() {
             area={"nav"}
             style={{ textAlign: "start" }}
             paddingX={3}
-            marginX={2}
+             marginX={2}
           >
             <Container
               display={"flex"}
