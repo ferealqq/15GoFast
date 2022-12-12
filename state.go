@@ -62,7 +62,7 @@ func (m *Move) Print() {
 type State struct {
 	size       t_cell
 	board      [16]t_cell
-	complexity t_int
+	complexity int
 }
 
 // returns pointer to a new state with clean board.
@@ -75,7 +75,7 @@ func NewState() *State {
 }
 
 // Genereates a State with a board that has shuffeled with N transitions where N is complexity
-func GenerateState(complexity t_int) (*State, error) {
+func GenerateState(complexity int) (*State, error) {
 	// https://www.geeksforgeeks.org/check-instance-15-puzzle-solvable/
 	state := NewState()
 	visited := []int{}

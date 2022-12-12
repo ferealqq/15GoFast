@@ -15,7 +15,7 @@ const DEFAULT_MAX_RUNTIME = 5000
 type App struct {
 	ctx        context.Context
 	search     *SearchState
-	complexity t_int
+	complexity int
 	maxRuntime time.Duration
 }
 
@@ -62,7 +62,7 @@ func (app *App) GetDefaultMaxRuntime() int {
 	return DEFAULT_MAX_RUNTIME
 }
 
-func (app *App) SetComplexity(comp t_int) {
+func (app *App) SetComplexity(comp int) {
 	app.complexity = comp
 }
 

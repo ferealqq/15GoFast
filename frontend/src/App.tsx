@@ -52,7 +52,7 @@ type SolveData = {
 };
 
 const DEFAULT_MOVE_ANIMATION_TIME = 200;
-const DEFAULT_COMPLEXITY = 500;
+const DEFAULT_COMPLEXITY = 1000;
 const DEFAULT_MAX_RUNTIME = 5500;
 
 function App() {
@@ -176,7 +176,7 @@ function App() {
             area={"nav"}
             style={{ textAlign: "start" }}
             paddingX={3}
-             marginX={2}
+            marginX={2}
           >
             <Container
               display={"flex"}
@@ -381,6 +381,7 @@ const Puzzle = ({
 
   useEffect(() => {
     if (boards.length > 1) {
+      // Cycle through the boards one by one to create the illusion of moving the tiles
       let interval = setInterval(() => {
         if (index.current < boards.length - 1) {
           index.current += 1;
@@ -426,7 +427,7 @@ const Puzzle = ({
             transition={{
               type: "spring",
               stiffness: 350,
-              damping: 25,
+              damping: 20,
               duration: moveAnimationTime - 25,
             }}
           >
