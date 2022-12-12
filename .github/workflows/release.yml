@@ -42,6 +42,7 @@ jobs:
           build-name: ${{ matrix.build.name }}
           build-platform: ${{ matrix.build.platform }}
           sign: ${{matrix.build.sign}}
+          sign-macos-installer-id: "DONT TRY TO SIGN!"
 
       # Upload build assets
       - uses: actions/upload-artifact@v2
