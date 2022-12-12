@@ -33,23 +33,26 @@ Generally the algorithmic implementation of the application focuses on the faste
 
 ## Usage
 
-### Executable applications can be found under the `release` folder
-
-Release contains only `linux-amd64` and `darwin (macos)` executables. If you are using windows or other OS linux distribution and want to test the application you should compile the [executable yourself](##building).
+### Executable applications can be found in the [releases page](https://github.com/ferealqq/15GoFast/releases)
 
 Start:
 ```terminal
 # linux 
-wget https://github.com/ferealqq/15GoFast/releases/download/latest/15GoFast_linux_amd
+wget https://github.com/ferealqq/15GoFast/releases/download/v0.0.1/15GoFast-linux-amd
 chmod +x 15GoFast_linux_amd
 ./15GoFast_linux_amd
 ```
 
 ```terminal
 # macos  
-wget https://github.com/ferealqq/15GoFast/releases/download/latest/15GoFast_darwin
+wget https://github.com/ferealqq/15GoFast/releases/download/v0.0.1/15GoFast-darwin
 chmod +x 15GoFast_darwin
 ./15GoFast_darwin
+```
+
+```terminal
+# windows  
+echo "Unknown, not sure, don't want to find out"
 ```
 
 ## Installation 
