@@ -2,18 +2,17 @@ name: Release the newest version
 
 on:
   push:
-    branches:
-      - ci
-
+    tags:
+      - 'v*'
 jobs:
   build:
     strategy:
       fail-fast: false
       matrix:
         build: [
-          {name: wailsTest, platform: linux/amd64, os: ubuntu-latest},
-          {name: wailsTest, platform: windows/amd64, os: windows-latest},
-          {name: wailsTest, platform: darwin/universal, os: macos-latest}
+          {name: 15GoFast-linux-amd, platform: linux/amd64, os: ubuntu-latest},
+          {name: 15GoFast-windows, platform: windows/amd64, os: windows-latest},
+          {name: 15GoFast-darwin, platform: darwin/universal, os: macos-latest}
         ]
     runs-on: ${{ matrix.build.os }}
     steps:
@@ -29,7 +28,6 @@ jobs:
 
       # Upload build assets
       - uses: actions/upload-artifact@v2
-        if: inputs.package == 'true'
         with:
           name: 15GoFast ${{matrix.os}} ${{matrix.name}}
           path: |
@@ -38,6 +36,7 @@ jobs:
 
   release:
     name: "Release"
+    needs: build
     runs-on: "ubuntu-latest"
 
     steps:
