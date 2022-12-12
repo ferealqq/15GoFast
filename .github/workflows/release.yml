@@ -43,14 +43,16 @@ jobs:
           build-platform: ${{ matrix.build.platform }}
           sign: ${{matrix.build.sign}}
           sign-macos-installer-id: "DONT TRY TO SIGN!"
+          package: "false"
 
       # Upload build assets
       - uses: actions/upload-artifact@v2
         with:
-          name: 15GoFast ${{matrix.os}} ${{matrix.name}}
+          name: ${{matrix.build.name}}
           path: |
             */bin/
             *\bin\*
+            */bin/*.app/Contents/MacOS/
 
   release:
     name: "Release"
@@ -63,5 +65,6 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            */bin/
+            */bin/*
+            */bin/*.app/Contents/MacOS/*
             *\bin\*
