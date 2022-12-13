@@ -39,20 +39,20 @@ Start:
 ```terminal
 # linux 
 wget https://github.com/ferealqq/15GoFast/releases/download/v0.0.1/15GoFast-linux-amd
-chmod +x 15GoFast_linux_amd
-./15GoFast_linux_amd
+chmod +x 15GoFast-linux-amd
+./15GoFast-linux-amd
 ```
 
 ```terminal
 # macos  
 wget https://github.com/ferealqq/15GoFast/releases/download/v0.0.1/15GoFast-darwin
-chmod +x 15GoFast_darwin
-./15GoFast_darwin
+chmod +x 15GoFast-darwin
+./15GoFast-darwin
 ```
 
 ```terminal
 # windows  
-echo "Unknown, not sure, don't want to find out"
+echo "Don't know, not sure, don't want to find out"
 ```
 
 ## Installation 
