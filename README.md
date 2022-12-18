@@ -6,7 +6,7 @@
 
 15 puzzle solver implementation with [golang](https://go.dev).
 
-Generally the algorithmic implementation of the application focuses on the fastest possible solve time. In hindsight the implementation could be even faster, but generally the algorithm implementation achieves faster solve times than many other 15 puzzle solvers. I’ll add some proof to these claims <i>later</i>.
+Generally the algorithmic implementation of the application focuses on the fastest possible solve time. In hindsight the implementation could be even faster, but generally the algorithm implementation achieves very fast sovle times when taking into accord that this implementation does not contain a pattern databases (walking distance table isn't a pattern database imo). Best possible solve time can be only achieved with pattern database.
 
 </br>
 
