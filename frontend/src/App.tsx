@@ -433,7 +433,7 @@ const Puzzle = ({
           >
             <Heading textAlign={"center"} margin="auto">
               {" "}
-              {item}{" "}
+              {item === 0 ? "" : item}{" "}
             </Heading>
           </motion.div>
         ))}
