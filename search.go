@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -27,16 +26,20 @@ func NewSearch(state *State) *SearchState {
 		hasSeen:     make(map[int]*State),
 		successCode: codeUniq(startingPoint(state.size)),
 	}
-
+	// set the used heuristic function to the search.
 	srh.Heuristic = srh.memo(wd.Calculate)
-	// srh.Heuristic = wd.Calculate
 
 	return srh
 }
 
 type heurFn = func([16]t_cell) int
-
+// Memoize expensive calculation. 
 func (search *SearchState) memo(fn heurFn) heurFn {
+	// Memoization is a simple form of caching expensive calculations. 
+	// Using memoization is a trade off between memory usage and CPU usage.
+	// This function stores boards and the heuristic value that the board represents. 
+	// if the boards heuristic value has been calculated return the calculated value from cache 
+	// if not, calculate the value and store it in a cache and then return the value.
 	cache := make(map[int]int)
 
 	return func(input [16]t_cell) int {
@@ -53,7 +56,7 @@ func (search *SearchState) memo(fn heurFn) heurFn {
 type result struct {
 	status STATUS
 	cutoff t_int
-}
+}	
 
 // Iterative Deepening A* search algorithm
 func (search *SearchState) IDAStar(maxRuntimeMS time.Duration) (*SearchState, STATUS) {
@@ -66,7 +69,6 @@ func (search *SearchState) IDAStar(maxRuntimeMS time.Duration) (*SearchState, ST
 	for {
 		select {
 		case <-quitTick.C:
-			fmt.Println("time limit exceeded")
 			return search, TIME_EXCEEDED
 		default:
 			status, cut := search.IDASearch(cutoff, t_int(0))
@@ -95,12 +97,14 @@ func (search *SearchState) IDASearch(cutoff t_int, cost t_int) (STATUS, t_int) {
 	state := search.state
 	h := search.Heuristic(state.board)
 	f := t_int(h) + cost
+	// if the cutoff limit has been achieved return the cutoff.
 	if f > cutoff {
 		return CUTOFF, f
 	}
 	var old State = *search.state
 	stop := false
 	nextCutoff := cutoff
+	// iterate all the valid moves that are available to the currrent board (state.board)
 	for _, next := range state.GetValidStates() {
 		if next == nil {
 			continue

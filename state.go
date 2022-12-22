@@ -84,8 +84,10 @@ func GenerateState(complexity int) (*State, error) {
 	rand.Seed(time.Now().UnixNano())
 	for state.complexity < complexity {
 		visited = append(visited, codeUniq(state.board))
+		// get all valid moves
 		sts := state.GetValidStates()
 		filtered := []*State{}
+		// filter the boards that already has been visited.
 		for _, next := range sts {
 			if next == nil {
 				continue
@@ -102,6 +104,7 @@ func GenerateState(complexity int) (*State, error) {
 		}
 		rn := rand.Intn(len(filtered))
 		olds = append(olds, state)
+		// select a random board from the filtered boards
 		state = filtered[rn]
 	}
 
@@ -132,9 +135,6 @@ func getElementIndex(arr [16]t_cell, element t_cell) t_cell {
 
 // Calculate all the states that the current state can be mutated to
 func (state *State) GetValidStates() [4]*State {
-	// This function is currently O(N^2) - O(N^N), where N = 4
-	// appned O(N)
-	// newSwap O(N)*
 	var states [4]*State
 
 	// get emtpy index from the board

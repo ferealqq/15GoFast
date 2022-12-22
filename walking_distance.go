@@ -24,7 +24,6 @@ func nVisit(cost t_cell, board [16]t_cell, e t_cell) *visitSt {
 
 // Generates a unique int representation of the board. Generates the same int for the same board every time, becuase it shifts the bits according to the value and index positions
 func code(board [16]t_cell) int {
-	// FIXME: some times returns the same code for a different board
 	r := 0
 	for i := range board {
 		r |= int(board[i]) << (bitsLen * i)
@@ -70,17 +69,18 @@ func NewWD(rowSize int) *WalkingDistance {
 func (wd *WalkingDistance) GenerateTable() *WalkingDistance {
 	wd.table = make(map[int]t_cell)
 	size := t_cell(wd.size)
-	// TODO Fix hard coded solved
 	solved := [16]t_cell{4, 0, 0, 0, 0, 4, 0, 0, 0, 0, 4, 0, 0, 0, 0, 3}
 	visitable := make(chan *visitSt, 92850)
 	visitable <- nVisit(0, solved, size-1)
 	count := 0
+	// precalculate the walking distance table 
 	for visit := range visitable {
 		key := code(visit.board)
 		if _, found := wd.table[key]; found {
 			continue
 		}
 		wd.table[key] = visit.cost
+		// calculates the horizontal or vertical heuristics of a board
 		for _, d := range []t_cell{-1, 1} {
 			if 0 <= (visit.e+d) && (visit.e+d) < size {
 				var i t_cell
@@ -97,6 +97,7 @@ func (wd *WalkingDistance) GenerateTable() *WalkingDistance {
 				}
 			}
 		}
+		// check if the maximum amount of table items has been created 
 		if count == 92850 {
 			close(visitable)
 		}
@@ -121,7 +122,7 @@ func (wd *WalkingDistance) Calculate(board [16]t_cell) int {
 		// xCor = vertical index of the correct position
 		// yCor = horizontal index of the correct position
 		xCor, yCor := corIdx%wd.size, corIdx/wd.size
-		// TODO Explain this
+		// craete the vertical (row) and horizontal (col) codes that point to the walking distance table 
 		rowCode += 1 << (wd.bitLength * (wd.size*yi + yCor))
 		colCode += 1 << (wd.bitLength * (wd.size*xi + xCor))
 
@@ -149,6 +150,7 @@ func (wd *WalkingDistance) Calculate(board [16]t_cell) int {
 			}
 		}
 	}
+	// sum heuristic values together. 	
 	heurestic += int(wd.table[rowCode] + wd.table[colCode])
 
 	return heurestic
